@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using System;
+﻿using System;
 using System.Net;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using MySettingsReader;
@@ -12,84 +12,85 @@ using Service.EducationApi.Settings;
 
 namespace Service.EducationApi
 {
-    public class Program
-    {
-        public const string SettingsFileName = ".myjeteducation";
+	public class Program
+	{
+		private const string JwtSecretName = "JWT_SECRET";
+		private const string SettingsFileName = ".myjeteducation";
 
-        public static SettingsModel Settings { get; private set; }
+		public static SettingsModel Settings { get; private set; }
 
-        public static ILoggerFactory LogFactory { get; private set; }
+		public static ILoggerFactory LogFactory { get; private set; }
 
-        public static Func<T> ReloadedSettings<T>(Func<SettingsModel, T> getter)
-        {
-            return () =>
-            {
-                var settings = SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
-                var value = getter.Invoke(settings);
-                return value;
-            };
-        }
-        
-        public static string JwtSecret { get; private set; }
+		public static string JwtSecret { get; private set; }
 
-        public static void Main(string[] args)
-        {
-            Console.Title = "MyJetWallet Service.EducationApi";
-            
-            JwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
-            if (string.IsNullOrWhiteSpace(JwtSecret))
-            {
-                Console.WriteLine("PLEASE CONFIGURE ENV VAR: JWT_SECRET !");
-                throw new Exception("PLEASE CONFIGURE ENV VAR: JWT_SECRET !");
-            }
-            
-            
+		public static void Main(string[] args)
+		{
+			Console.Title = "MyJetWallet Service.EducationApi";
+			LoadJwtSecret();
+			Settings = LoadSettings();
 
-            Settings = SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
+			using ILoggerFactory loggerFactory = LogConfigurator.ConfigureElk("MyJetWallet", Settings.SeqServiceUrl, Settings.ElkLogs);
+			ILogger<Program> logger = loggerFactory.CreateLogger<Program>();
+			LogFactory = loggerFactory;
 
-            using var loggerFactory = LogConfigurator.ConfigureElk("MyJetWallet", Settings.SeqServiceUrl, Settings.ElkLogs);
+			try
+			{
+				logger.LogInformation("Application is being started");
 
-            var logger = loggerFactory.CreateLogger<Program>();
+				CreateHostBuilder(loggerFactory, args).Build().Run();
 
-            LogFactory = loggerFactory;
+				logger.LogInformation("Application has been stopped");
+			}
+			catch (Exception ex)
+			{
+				logger.LogCritical(ex, "Application has been terminated unexpectedly");
+			}
+		}
 
-            try
-            {
-                logger.LogInformation("Application is being started");
+		private static void LoadJwtSecret()
+		{
+			JwtSecret = Environment.GetEnvironmentVariable(JwtSecretName);
 
-                CreateHostBuilder(loggerFactory, args).Build().Run();
+			void ShowError(string message)
+			{
+				Console.WriteLine(message);
+				throw new Exception(message);
+			}
 
-                logger.LogInformation("Application has been stopped");
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex, "Application has been terminated unexpectedly");
-            }
-        }
+			if (string.IsNullOrWhiteSpace(JwtSecret))
+				ShowError($"ERROR! Please configure environment variable: {JwtSecretName}!");
 
-        public static IHostBuilder CreateHostBuilder(ILoggerFactory loggerFactory, string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    var httpPort = Environment.GetEnvironmentVariable("HTTP_PORT") ?? "8080";
-                    var grpcPort = Environment.GetEnvironmentVariable("GRPC_PORT") ?? "80";
+			else if (JwtSecret.Length <= 15)
+				ShowError($"ERROR! Length of environment variable {JwtSecretName} must be greater or equal than 16 symbols!");
+		}
 
-                    Console.WriteLine($"HTTP PORT: {httpPort}");
-                    Console.WriteLine($"GRPC PORT: {grpcPort}");
+		private static SettingsModel LoadSettings() => SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
 
-                    webBuilder.ConfigureKestrel(options =>
-                    {
-                        options.Listen(IPAddress.Any, int.Parse(httpPort), o => o.Protocols = HttpProtocols.Http1);
-                        options.Listen(IPAddress.Any, int.Parse(grpcPort), o => o.Protocols = HttpProtocols.Http2);
-                    });
+		public static Func<T> ReloadedSettings<T>(Func<SettingsModel, T> getter) => () => getter.Invoke(LoadSettings());
 
-                    webBuilder.UseStartup<Startup>();
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(loggerFactory);
-                    services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-                });
-    }
+		public static IHostBuilder CreateHostBuilder(ILoggerFactory loggerFactory, string[] args) =>
+			Host.CreateDefaultBuilder(args)
+				.UseServiceProviderFactory(new AutofacServiceProviderFactory())
+				.ConfigureWebHostDefaults(webBuilder =>
+				{
+					string httpPort = Environment.GetEnvironmentVariable("HTTP_PORT") ?? "8080";
+					string grpcPort = Environment.GetEnvironmentVariable("GRPC_PORT") ?? "80";
+
+					Console.WriteLine($"HTTP PORT: {httpPort}");
+					Console.WriteLine($"GRPC PORT: {grpcPort}");
+
+					webBuilder.ConfigureKestrel(options =>
+					{
+						options.Listen(IPAddress.Any, int.Parse(httpPort), o => o.Protocols = HttpProtocols.Http1);
+						options.Listen(IPAddress.Any, int.Parse(grpcPort), o => o.Protocols = HttpProtocols.Http2);
+					});
+
+					webBuilder.UseStartup<Startup>();
+				})
+				.ConfigureServices(services =>
+				{
+					services.AddSingleton(loggerFactory);
+					services.AddSingleton(typeof (ILogger<>), typeof (Logger<>));
+				});
+	}
 }

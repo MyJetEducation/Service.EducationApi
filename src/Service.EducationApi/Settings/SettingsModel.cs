@@ -13,5 +13,11 @@ namespace Service.EducationApi.Settings
 
         [YamlProperty("EducationApi.ElkLogs")]
         public LogElkSettings ElkLogs { get; set; }
+
+        [YamlProperty("EducationApi.JwtTokenExpireMinutes")]
+        public int JwtTokenExpireMinutes { get; set; }
+
+        [YamlProperty("EducationApi.RefreshTokenExpireMinutes")]
+        public int RefreshTokenExpireMinutes { get; set; }
     }
 }
