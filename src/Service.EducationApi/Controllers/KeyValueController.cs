@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
@@ -24,11 +25,13 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IUserInfoService _userInfoService;
 		private readonly IKeyValueRepository _keyValueRepository;
+		private readonly ILogger<KeyValueController> _logger;
 
-		public KeyValueController(IUserInfoService userInfoService, IKeyValueRepository keyValueRepository)
+		public KeyValueController(IUserInfoService userInfoService, IKeyValueRepository keyValueRepository, ILogger<KeyValueController> logger)
 		{
 			_userInfoService = userInfoService;
 			_keyValueRepository = keyValueRepository;
+			_logger = logger;
 		}
 
 		[HttpPost("get")]
@@ -107,7 +110,9 @@ namespace Service.EducationApi.Controllers
 
 		private async ValueTask<Guid?> GetUserIdAsync()
 		{
-			string userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			string userName = User.Identity?.Name;
+
+			_logger.LogDebug("UserName from identity is {userName}", userName);
 
 			UserIdResponse userIdResponse = await _userInfoService.GetUserIdAsync(new UserInfoLoginRequest
 			{

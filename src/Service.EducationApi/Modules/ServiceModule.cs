@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.Extensions.Logging;
 using Service.EducationApi.Services;
 using Service.KeyValue.Client;
 using Service.UserInfo.Crud.Client;
@@ -18,7 +19,8 @@ namespace Service.EducationApi.Modules
 					context.Resolve<IUserInfoService>(),
 					Program.JwtSecret,
 					Program.Settings.JwtTokenExpireMinutes,
-					Program.Settings.RefreshTokenExpireMinutes))
+					Program.Settings.RefreshTokenExpireMinutes,
+					context.Resolve<ILogger<TokenService>>()))
 				.As<ITokenService>()
 				.SingleInstance();
 		}

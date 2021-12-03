@@ -49,7 +49,11 @@ namespace Service.EducationApi.Controllers
 			if (string.IsNullOrWhiteSpace(refreshToken))
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 
+			_logger.LogDebug("RefreshToken is: {token}", refreshToken);
+
 			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, GetIpAddress());
+
+			_logger.LogDebug("Answer for RefreshTokensAsync: {answer}", info);
 
 			return info == null
 				? Forbid()
