@@ -2,6 +2,7 @@
 using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyJetWallet.Sdk.Service;
@@ -43,13 +44,20 @@ namespace Service.EducationApi
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			app.UseEndpoints(endpoints => endpoints.MapControllers());
+			app.UseEndpoints(endpoints =>
+			{
+				endpoints.MapControllers();
+
+				endpoints.MapGet("/", async context =>
+				{
+					await context.Response.WriteAsync("Api endpoint");
+				});
+			});
 		}
 
 		public void ConfigureContainer(ContainerBuilder builder)
 		{
 			builder.RegisterModule<SettingsModule>();
-			builder.RegisterModule<ServiceModule>();
 			builder.RegisterModule<ServiceModule>();
 		}
 	}
