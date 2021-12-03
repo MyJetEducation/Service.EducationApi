@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
@@ -15,8 +16,13 @@ namespace Service.EducationApi.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly ITokenService _tokenService;
+		private readonly ILogger<AuthController> _logger;
 
-		public AuthController(ITokenService tokenService) => _tokenService = tokenService;
+		public AuthController(ITokenService tokenService, ILogger<AuthController> logger)
+		{
+			_tokenService = tokenService;
+			_logger = logger;
+		}
 
 		[AllowAnonymous]
 		[HttpPost("login")]
@@ -52,9 +58,13 @@ namespace Service.EducationApi.Controllers
 
 		private string GetIpAddress()
 		{
-			return Request.Headers.ContainsKey("X-Forwarded-For") 
+			string requestHeader = Request.Headers.ContainsKey("X-Forwarded-For") 
 				? (string) Request.Headers["X-Forwarded-For"] 
 				: HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+
+			_logger.LogDebug("User IP is: {ip}", requestHeader);
+
+			return requestHeader;
 		}
 	}
 }
