@@ -30,9 +30,10 @@ namespace Service.EducationApi.Services
 		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request, string ipAddress)
 		{
 			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName });
+			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
 
-			return userInfo.UserAuthInfo != null && userInfo.UserAuthInfo.Password == request.Password
-				? await GetNewTokenInfo(userInfo.UserAuthInfo, ipAddress)
+			return authInfo != null && authInfo.Password == request.Password
+				? await GetNewTokenInfo(authInfo, ipAddress)
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
@@ -50,7 +51,8 @@ namespace Service.EducationApi.Services
 		{
 			var newTokenInfoRequest = new UserNewTokenInfoRequest
 			{
-				IpAddress = ipAddress
+				IpAddress = ipAddress,
+				UserId = userAuthInfo.UserId
 			};
 
 			SetJwtToken(newTokenInfoRequest, userAuthInfo);
@@ -66,7 +68,7 @@ namespace Service.EducationApi.Services
 		private void SetJwtToken(UserNewTokenInfoRequest tokenInfoRequest, UserAuthInfoGrpcModel userAuthInfo)
 		{
 			byte[] key = Encoding.ASCII.GetBytes(_jwtSecret);
-			string clientId = tokenInfoRequest.UserName;
+			string clientId = userAuthInfo.UserName;
 
 			var claims = new[]
 			{
