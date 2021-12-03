@@ -27,27 +27,31 @@ namespace Service.EducationApi.Services
 			_refreshTokenExpireMinutes = refreshTokenExpireMinutes;
 		}
 
-		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request)
+		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request, string ipAddress)
 		{
-			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName});
+			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName });
 
 			return userInfo.UserAuthInfo != null && userInfo.UserAuthInfo.Password == request.Password
-				? await GetNewTokenInfo(userInfo.UserAuthInfo)
+				? await GetNewTokenInfo(userInfo.UserAuthInfo, ipAddress)
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
-		public async ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken)
+		public async ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken, string ipAddress)
 		{
-			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken});
+			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken });
+			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
 
-			return userInfo.UserAuthInfo != null && userInfo.UserAuthInfo.RefreshTokenExpires < DateTime.UtcNow
-				? await GetNewTokenInfo(userInfo.UserAuthInfo)
+			return authInfo != null && authInfo.RefreshTokenExpires < DateTime.UtcNow && authInfo.IpAddress == ipAddress
+				? await GetNewTokenInfo(authInfo, ipAddress)
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
-		private async ValueTask<TokenInfo> GetNewTokenInfo(UserAuthInfoGrpcModel userAuthInfo)
+		private async ValueTask<TokenInfo> GetNewTokenInfo(UserAuthInfoGrpcModel userAuthInfo, string ipAddress)
 		{
-			var newTokenInfoRequest = new UserNewTokenInfoRequest();
+			var newTokenInfoRequest = new UserNewTokenInfoRequest
+			{
+				IpAddress = ipAddress
+			};
 
 			SetJwtToken(newTokenInfoRequest, userAuthInfo);
 			SetRefreshToken(newTokenInfoRequest);

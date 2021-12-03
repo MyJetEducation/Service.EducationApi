@@ -9,7 +9,5 @@ namespace Service.EducationApi.Models
 
 		[Required]
 		public string Password { get; set; }
-
-		public bool IsInvalid => string.IsNullOrWhiteSpace(UserName) || string.IsNullOrWhiteSpace(Password);
 	}
 }

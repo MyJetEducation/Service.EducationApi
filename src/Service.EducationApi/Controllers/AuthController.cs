@@ -24,10 +24,10 @@ namespace Service.EducationApi.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async ValueTask<IActionResult> Login([FromBody] LoginRequest request)
 		{
-			if (request.IsInvalid)
+			if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 
-			TokenInfo info = await _tokenService.GenerateTokensAsync(request);
+			TokenInfo info = await _tokenService.GenerateTokensAsync(request, GetIpAddress());
 
 			return info == null
 				? Unauthorized()
@@ -43,11 +43,18 @@ namespace Service.EducationApi.Controllers
 			if (string.IsNullOrWhiteSpace(refreshToken))
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 
-			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken);
+			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, GetIpAddress());
 
 			return info == null
 				? Forbid()
 				: DataResponse<TokenInfo>.Ok(info);
+		}
+
+		private string GetIpAddress()
+		{
+			return Request.Headers.ContainsKey("X-Forwarded-For") 
+				? (string) Request.Headers["X-Forwarded-For"] 
+				: HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 		}
 	}
 }
