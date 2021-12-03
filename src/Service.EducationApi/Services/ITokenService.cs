@@ -1,10 +1,11 @@
-﻿using Service.EducationApi.Models;
+﻿using System.Threading.Tasks;
+using Service.EducationApi.Models;
 
 namespace Service.EducationApi.Services
 {
 	public interface ITokenService
 	{
-		LoginResponse GenerateTokens(LoginRequest request);
-		LoginResponse RefreshTokens(string currentRefreshToken);
+		ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request);
+		ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken);
 	}
 }

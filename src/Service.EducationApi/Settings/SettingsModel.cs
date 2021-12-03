@@ -19,5 +19,11 @@ namespace Service.EducationApi.Settings
 
         [YamlProperty("EducationApi.RefreshTokenExpireMinutes")]
         public int RefreshTokenExpireMinutes { get; set; }
+
+        [YamlProperty("EducationApi.UserInfoCrudServiceUrl")]
+        public string UserInfoCrudServiceUrl { get; set; }
+
+        [YamlProperty("EducationApi.KeyValueServiceUrl")]
+        public string KeyValueServiceUrl { get; set; }
     }
 }

@@ -34,7 +34,7 @@ namespace Service.EducationApi
 		/// <summary>
 		///     Headers settings
 		/// </summary>
-		public static void ConfigurateHeaders(this IServiceCollection services) => 
+		public static void ConfigurateHeaders(this IServiceCollection services) =>
 			services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
 		public static void ConfigureJwtBearerOptions(JwtBearerOptions options)
@@ -54,7 +54,7 @@ namespace Service.EducationApi
 			};
 		}
 
-		public  static void ConfigureAuthenticationOptions(AuthenticationOptions options)
+		public static void ConfigureAuthenticationOptions(AuthenticationOptions options)
 		{
 			options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 			options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

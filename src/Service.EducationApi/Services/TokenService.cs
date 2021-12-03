@@ -1,83 +1,82 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
+using Service.UserInfo.Crud.Grpc;
+using Service.UserInfo.Crud.Grpc.Contracts;
+using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Services
 {
 	public class TokenService : ITokenService
 	{
-		private static readonly UserInfo[] UserInfos;
+		private readonly IUserInfoService _userInfoService;
+		private readonly string _jwtSecret;
+		private readonly int _jwtTokenExpireMinutes;
+		private readonly int _refreshTokenExpireMinutes;
 
-		/// <summary>
-		///     Todo: remove after use db
-		/// </summary>
-		static TokenService()
+		public TokenService(IUserInfoService userInfoService, string jwtSecret, int jwtTokenExpireMinutes, int refreshTokenExpireMinutes)
 		{
-			UserInfos = new[]
-			{
-				new UserInfo
-				{
-					UserName = "user",
-					Password = "123",
-					Role = UserRole.Default
-				}
-			};
+			_userInfoService = userInfoService;
+			_jwtSecret = jwtSecret;
+			_jwtTokenExpireMinutes = jwtTokenExpireMinutes;
+			_refreshTokenExpireMinutes = refreshTokenExpireMinutes;
 		}
 
-		public LoginResponse GenerateTokens(LoginRequest request)
+		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request)
 		{
-			UserInfo userInfo = UserInfos.FirstOrDefault(info => info.UserName == request.UserName && info.Password == request.Password);
+			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName});
 
-			return userInfo != null
-				? UpdateTokens(userInfo)
-				: null;
+			return userInfo.UserAuthInfo != null && userInfo.UserAuthInfo.Password == request.Password
+				? await GetNewTokenInfo(userInfo.UserAuthInfo)
+				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
-		public LoginResponse RefreshTokens(string currentRefreshToken)
+		public async ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken)
 		{
-			if (string.IsNullOrWhiteSpace(currentRefreshToken))
-				return null;
+			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken});
 
-			UserInfo userInfo = UserInfos.FirstOrDefault(info => info.RefreshToken == currentRefreshToken);
-
-			return userInfo?.IsRefreshTokenActive == true
-				? UpdateTokens(userInfo)
-				: null;
+			return userInfo.UserAuthInfo != null && userInfo.UserAuthInfo.RefreshTokenExpires < DateTime.UtcNow
+				? await GetNewTokenInfo(userInfo.UserAuthInfo)
+				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
-		private static LoginResponse UpdateTokens(UserInfo userInfo)
+		private async ValueTask<TokenInfo> GetNewTokenInfo(UserAuthInfoGrpcModel userAuthInfo)
 		{
-			SetJwtToken(userInfo);
-			SetRefreshToken(userInfo);
+			var newTokenInfoRequest = new UserNewTokenInfoRequest();
 
-			return new LoginResponse(userInfo);
+			SetJwtToken(newTokenInfoRequest, userAuthInfo);
+			SetRefreshToken(newTokenInfoRequest);
+
+			CommonResponse response = await _userInfoService.UpdateUserTokenInfoAsync(newTokenInfoRequest);
+			if (!response.IsSuccess)
+				return await ValueTask.FromResult<TokenInfo>(null);
+
+			return new TokenInfo(newTokenInfoRequest);
 		}
 
-		private static void SetJwtToken(UserInfo userInfo)
+		private void SetJwtToken(UserNewTokenInfoRequest tokenInfoRequest, UserAuthInfoGrpcModel userAuthInfo)
 		{
-			byte[] key = Encoding.ASCII.GetBytes(Program.JwtSecret);
-			string clientId = userInfo.UserName;
+			byte[] key = Encoding.ASCII.GetBytes(_jwtSecret);
+			string clientId = tokenInfoRequest.UserName;
 
 			var claims = new[]
 			{
 				new Claim(JwtRegisteredClaimNames.Aud, "education-api"),
 				new Claim(ClaimsIdentity.DefaultNameClaimType, clientId),
-				new Claim(ClaimsIdentity.DefaultRoleClaimType, userInfo.Role)
+				new Claim(ClaimsIdentity.DefaultRoleClaimType, userAuthInfo.Role)
 			};
 
 			var identity = new GenericIdentity(clientId);
-			int expireMinutes = Program.Settings.JwtTokenExpireMinutes;
 
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(identity, claims),
-				Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
+				Expires = DateTime.UtcNow.AddMinutes(_jwtTokenExpireMinutes),
 				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
 			};
 
@@ -85,18 +84,16 @@ namespace Service.EducationApi.Services
 
 			SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
 
-			userInfo.JwtToken = tokenHandler.WriteToken(token);
+			tokenInfoRequest.JwtToken = tokenHandler.WriteToken(token);
 		}
 
-		private static void SetRefreshToken(UserInfo userInfo)
+		private void SetRefreshToken(UserNewTokenInfoRequest tokenInfoRequest)
 		{
 			byte[] key = Encoding.ASCII.GetBytes(Guid.NewGuid().ToString());
 
-			userInfo.RefreshToken = Convert.ToBase64String(key);
+			tokenInfoRequest.RefreshToken = Convert.ToBase64String(key);
 
-			int expireMinutes = Program.Settings.RefreshTokenExpireMinutes;
-
-			userInfo.RefreshTokenExpires = DateTime.UtcNow.AddMinutes(expireMinutes);
+			tokenInfoRequest.RefreshTokenExpires = DateTime.UtcNow.AddMinutes(_refreshTokenExpireMinutes);
 		}
 	}
 }

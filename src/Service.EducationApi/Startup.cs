@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using MyJetWallet.Sdk.Service;
 using Prometheus;
 using Service.EducationApi.Modules;
-using Service.EducationApi.Services;
 using SimpleTrading.ServiceStatusReporterConnector;
 
 namespace Service.EducationApi
@@ -26,8 +25,6 @@ namespace Service.EducationApi
 			services
 				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
 				.AddJwtBearer(StartupUtils.ConfigureJwtBearerOptions);
-
-			services.AddScoped<ITokenService, TokenService>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
