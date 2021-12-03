@@ -54,7 +54,7 @@ namespace Service.EducationApi.Controllers
 
 			KeyValueModel[] items = itemsResponse?.Items;
 			if (items == null)
-				return StatusResponse.Error(ResponseCode.NoData);
+				return StatusResponse.Error(ResponseCode.NoResponseData);
 
 			return DataResponse<KeyValueList>.Ok(new KeyValueList
 			{

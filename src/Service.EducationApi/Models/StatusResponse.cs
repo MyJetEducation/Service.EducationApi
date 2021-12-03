@@ -7,7 +7,7 @@ namespace Service.EducationApi.Models
 	{
 		public int Status { get; set; }
 
-		public static IActionResult Error(int code = ResponseCode.UnknownError) => new OkObjectResult(
+		public static IActionResult Error(int code = ResponseCode.Fail) => new OkObjectResult(
 			new StatusResponse
 			{
 				Status = code
