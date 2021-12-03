@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -35,7 +36,7 @@ namespace Service.EducationApi.Services
 			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName });
 			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
 
-			_logger.LogDebug("Answer for GetUserInfoByLoginAsync: {answer}", userInfo);
+			_logger.LogDebug("Answer for GetUserInfoByLoginAsync: {answer}", JsonSerializer.Serialize(userInfo));
 
 			return authInfo != null && authInfo.Password == request.Password
 				? await GetNewTokenInfo(authInfo, ipAddress)
@@ -47,7 +48,7 @@ namespace Service.EducationApi.Services
 			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken });
 			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
 
-			_logger.LogDebug("Answer for GetUserInfoByTokenAsync: {answer}", userInfo);
+			_logger.LogDebug("Answer for GetUserInfoByTokenAsync: {answer}", JsonSerializer.Serialize(userInfo));
 
 			return authInfo != null && authInfo.RefreshTokenExpires < DateTime.UtcNow && authInfo.IpAddress == ipAddress
 				? await GetNewTokenInfo(authInfo, ipAddress)
@@ -65,7 +66,12 @@ namespace Service.EducationApi.Services
 			SetJwtToken(newTokenInfoRequest, userAuthInfo);
 			SetRefreshToken(newTokenInfoRequest);
 
+			_logger.LogDebug("UserNewTokenInfoRequest for UpdateUserTokenInfoAsync: {answer}", JsonSerializer.Serialize(newTokenInfoRequest));
+
 			CommonResponse response = await _userInfoService.UpdateUserTokenInfoAsync(newTokenInfoRequest);
+
+			_logger.LogDebug("Answer for UpdateUserTokenInfoAsync: {answer}", JsonSerializer.Serialize(response));
+
 			if (!response.IsSuccess)
 				return await ValueTask.FromResult<TokenInfo>(null);
 

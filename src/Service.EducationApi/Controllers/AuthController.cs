@@ -53,8 +53,6 @@ namespace Service.EducationApi.Controllers
 
 			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, GetIpAddress());
 
-			_logger.LogDebug("Answer for RefreshTokensAsync: {answer}", info);
-
 			return info == null
 				? Forbid()
 				: DataResponse<TokenInfo>.Ok(info);
