@@ -14,8 +14,6 @@ namespace Service.EducationApi.Controllers
 	[Route("/api/register/v1")]
 	public class RegisterController : BaseController
 	{
-		private const int ActivationHashLength = 21;
-
 		private readonly IUserInfoService _userInfoService;
 		private readonly ILoginRequestValidator _loginRequestValidator;
 		
@@ -49,7 +47,7 @@ namespace Service.EducationApi.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async ValueTask<IActionResult> ConfirmRegister([FromBody, Required] string hash)
 		{
-			if (hash.IsNullOrWhiteSpace() || hash.Length != ActivationHashLength)
+			if (hash.IsNullOrWhiteSpace())
 			{
 				WaitFakeRequest();
 				return StatusResponse.Error(ResponseCode.NoRequestData);
