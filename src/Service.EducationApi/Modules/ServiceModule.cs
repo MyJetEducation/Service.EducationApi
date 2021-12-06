@@ -14,6 +14,8 @@ namespace Service.EducationApi.Modules
 			builder.RegisterUserInfoCrudClient(Program.Settings.UserInfoCrudServiceUrl);
 			builder.RegisterKeyValueClient(Program.Settings.KeyValueServiceUrl);
 
+			builder.RegisterType<LoginRequestValidator>().AsImplementedInterfaces();
+
 			builder.Register(context =>
 				new TokenService(
 					context.Resolve<IUserInfoService>(),

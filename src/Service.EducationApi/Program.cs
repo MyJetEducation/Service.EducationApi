@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using MySettingsReader;
+using Service.EducationApi.Extensions;
 using Service.EducationApi.Settings;
 
 namespace Service.EducationApi
@@ -57,7 +58,7 @@ namespace Service.EducationApi
 				throw new Exception(message);
 			}
 
-			if (string.IsNullOrWhiteSpace(JwtSecret))
+			if (JwtSecret.IsNullOrWhiteSpace())
 				ShowError($"ERROR! Please configure environment variable: {JwtSecretName}!");
 
 			else if (JwtSecret.Length <= 15)

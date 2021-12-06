@@ -1,37 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Service.EducationApi.Constants;
+using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
-	[ApiController]
 	[Route("/api/auth/v1")]
-	public class AuthController : ControllerBase
+	public class AuthController : BaseController
 	{
 		private readonly ITokenService _tokenService;
 		private readonly ILogger<AuthController> _logger;
+		private readonly ILoginRequestValidator _loginRequestValidator;
 
-		public AuthController(ITokenService tokenService, ILogger<AuthController> logger)
+		public AuthController(ITokenService tokenService, ILogger<AuthController> logger, ILoginRequestValidator loginRequestValidator)
 		{
 			_tokenService = tokenService;
 			_logger = logger;
+			_loginRequestValidator = loginRequestValidator;
 		}
 
 		[AllowAnonymous]
 		[HttpPost("login")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 		public async ValueTask<IActionResult> Login([FromBody] LoginRequest request)
 		{
-			if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
+			if (_loginRequestValidator.ValidateRequired(request))
+			{
+				WaitFakeRequest();
 				return StatusResponse.Error(ResponseCode.NoRequestData);
+			}
 
 			TokenInfo info = await _tokenService.GenerateTokensAsync(request, GetIpAddress());
 
@@ -44,10 +51,14 @@ namespace Service.EducationApi.Controllers
 		[HttpPost("refresh-token")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		public async ValueTask<IActionResult> RefreshToken([FromBody, SwaggerRequestBody(Required = true)] string refreshToken)
+		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+		public async ValueTask<IActionResult> RefreshToken([FromBody, Required] string refreshToken)
 		{
-			if (string.IsNullOrWhiteSpace(refreshToken))
+			if (refreshToken.IsNullOrWhiteSpace())
+			{
+				WaitFakeRequest();
 				return StatusResponse.Error(ResponseCode.NoRequestData);
+			}
 
 			_logger.LogDebug("RefreshToken is: {token}", refreshToken);
 
@@ -60,9 +71,12 @@ namespace Service.EducationApi.Controllers
 
 		private string GetIpAddress()
 		{
-			string requestHeader = Request.Headers.ContainsKey("X-Forwarded-For") 
-				? (string) Request.Headers["X-Forwarded-For"] 
-				: HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+			string requestHeader = Request.Headers.ContainsKey("X-Forwarded-For")
+				? (string) Request.Headers["X-Forwarded-For"]
+				: HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+
+			if (requestHeader == null)
+				throw new Exception("Can't obtain user IP address. Skip request");
 
 			_logger.LogDebug("User IP is: {ip}", requestHeader);
 

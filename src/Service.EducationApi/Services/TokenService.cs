@@ -50,7 +50,7 @@ namespace Service.EducationApi.Services
 
 			_logger.LogDebug("Answer for GetUserInfoByTokenAsync: {answer}", JsonSerializer.Serialize(userInfo));
 
-			return authInfo != null && authInfo.RefreshTokenExpires < DateTime.UtcNow && authInfo.IpAddress == ipAddress
+			return authInfo != null && authInfo.IpAddress == ipAddress && DateTime.UtcNow < authInfo.RefreshTokenExpires
 				? await GetNewTokenInfo(authInfo, ipAddress)
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
@@ -85,7 +85,7 @@ namespace Service.EducationApi.Services
 
 			var claims = new[]
 			{
-				new Claim(JwtRegisteredClaimNames.Aud, "education-api"),
+				new Claim(JwtRegisteredClaimNames.Aud, Program.Settings.JwtAudience),
 				new Claim(ClaimsIdentity.DefaultNameClaimType, clientId),
 				new Claim(ClaimsIdentity.DefaultRoleClaimType, userAuthInfo.Role)
 			};

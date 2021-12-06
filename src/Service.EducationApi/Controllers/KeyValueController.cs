@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -19,9 +18,8 @@ using CommonResponse = Service.KeyValue.Grpc.Models.CommonResponse;
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
-	[ApiController]
 	[Route("/api/keyvalue/v1")]
-	public class KeyValueController : ControllerBase
+	public class KeyValueController : BaseController
 	{
 		private readonly IUserInfoService _userInfoService;
 		private readonly IKeyValueRepository _keyValueRepository;
@@ -80,7 +78,7 @@ namespace Service.EducationApi.Controllers
 				Items = items?.Select(item => new KeyValueModel {Key = item.Key, Value = item.Value}).ToArray()
 			});
 
-			return HandleCommonResponse(response);
+			return Result(response.IsSuccess);
 		}
 
 		[HttpPost("delete")]
@@ -101,12 +99,8 @@ namespace Service.EducationApi.Controllers
 				Keys = keys
 			});
 
-			return HandleCommonResponse(response);
+			return Result(response.IsSuccess);
 		}
-
-		private static IActionResult HandleCommonResponse(CommonResponse response) => response?.IsSuccess == true
-			? StatusResponse.Ok()
-			: StatusResponse.Error();
 
 		private async ValueTask<Guid?> GetUserIdAsync()
 		{

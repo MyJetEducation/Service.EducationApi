@@ -12,4 +12,21 @@
 
 		public const int NoResponseData = -4;
 	}
+
+	public class LoginRequestValidationResponseCode
+	{
+		public const int PasswordContainsNoDigit = -5;
+
+		public const int PasswordContainsNoLetter = -6;
+
+		public const int PasswordContainsNoSymbol = -7;
+
+		public const int PasswordContainsNoUpper = -8;
+
+		public const int PasswordContainsNoLower = -9;
+
+		public const int PasswordTooShort = -10;
+
+		public const int NotValidEmail = -11;
+	}
 }
