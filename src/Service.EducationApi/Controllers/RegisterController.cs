@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace Service.EducationApi.Controllers
 		private readonly IUserInfoService _userInfoService;
 		private readonly ILoginRequestValidator _loginRequestValidator;
 		
-		public RegisterController(IUserInfoService userInfoService, ILoginRequestValidator loginRequestValidator)
+		public RegisterController(IUserInfoService userInfoService, ILoginRequestValidator loginRequestValidator) : base(userInfoService)
 		{
 			_userInfoService = userInfoService;
 			_loginRequestValidator = loginRequestValidator;
@@ -33,6 +34,10 @@ namespace Service.EducationApi.Controllers
 				WaitFakeRequest();
 				return StatusResponse.Error(validationResult.Value);
 			}
+
+			Guid? userId = await GetUserIdAsync(request.UserName);
+			if (userId != null)
+				return StatusResponse.Error(ResponseCode.UserAlreadyExists);
 
 			CommonResponse response = await _userInfoService.CreateUserInfoAsync(new UserInfoRegisterRequest
 			{

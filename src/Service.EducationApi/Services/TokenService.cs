@@ -33,20 +33,20 @@ namespace Service.EducationApi.Services
 
 		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request, string ipAddress)
 		{
-			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoLoginRequest {UserName = request.UserName });
-			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
+			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest { UserName = request.UserName, Password = request.Password });
+			UserInfoGrpcModel authInfo = userInfo?.UserInfo;
 
 			_logger.LogDebug("Answer for GetUserInfoByLoginAsync: {answer}", JsonSerializer.Serialize(userInfo));
 
-			return authInfo != null && authInfo.Password == request.Password
+			return authInfo != null
 				? await GetNewTokenInfo(authInfo, ipAddress)
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
 		public async ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken, string ipAddress)
 		{
-			UserAuthInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken });
-			UserAuthInfoGrpcModel authInfo = userInfo?.UserAuthInfo;
+			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken });
+			UserInfoGrpcModel authInfo = userInfo?.UserInfo;
 
 			_logger.LogDebug("Answer for GetUserInfoByTokenAsync: {answer}", JsonSerializer.Serialize(userInfo));
 
@@ -55,15 +55,15 @@ namespace Service.EducationApi.Services
 				: await ValueTask.FromResult<TokenInfo>(null);
 		}
 
-		private async ValueTask<TokenInfo> GetNewTokenInfo(UserAuthInfoGrpcModel userAuthInfo, string ipAddress)
+		private async ValueTask<TokenInfo> GetNewTokenInfo(UserInfoGrpcModel userInfo, string ipAddress)
 		{
 			var newTokenInfoRequest = new UserNewTokenInfoRequest
 			{
 				IpAddress = ipAddress,
-				UserId = userAuthInfo.UserId
+				UserId = userInfo.UserId
 			};
 
-			SetJwtToken(newTokenInfoRequest, userAuthInfo);
+			SetJwtToken(newTokenInfoRequest, userInfo);
 			SetRefreshToken(newTokenInfoRequest);
 
 			_logger.LogDebug("UserNewTokenInfoRequest for UpdateUserTokenInfoAsync: {answer}", JsonSerializer.Serialize(newTokenInfoRequest));
@@ -78,16 +78,16 @@ namespace Service.EducationApi.Services
 			return new TokenInfo(newTokenInfoRequest);
 		}
 
-		private void SetJwtToken(UserNewTokenInfoRequest tokenInfoRequest, UserAuthInfoGrpcModel userAuthInfo)
+		private void SetJwtToken(UserNewTokenInfoRequest tokenInfoRequest, UserInfoGrpcModel userInfo)
 		{
 			byte[] key = Encoding.ASCII.GetBytes(_jwtSecret);
-			string clientId = userAuthInfo.UserName;
+			string clientId = userInfo.UserName;
 
 			var claims = new[]
 			{
 				new Claim(JwtRegisteredClaimNames.Aud, Program.Settings.JwtAudience),
 				new Claim(ClaimsIdentity.DefaultNameClaimType, clientId),
-				new Claim(ClaimsIdentity.DefaultRoleClaimType, userAuthInfo.Role)
+				new Claim(ClaimsIdentity.DefaultRoleClaimType, userInfo.Role)
 			};
 
 			var identity = new GenericIdentity(clientId);

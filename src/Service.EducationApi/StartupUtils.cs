@@ -48,7 +48,7 @@ namespace Service.EducationApi
 				IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Program.JwtSecret)),
 				ValidateIssuer = false,
 				ValidateAudience = true,
-				ValidAudience = "education-api",
+				ValidAudience = Program.Settings.JwtAudience,
 				ValidateLifetime = true,
 				LifetimeValidator = (before, expires, token, parameters) => expires != null && expires > DateTime.UtcNow
 			};

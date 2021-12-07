@@ -9,6 +9,7 @@ using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
+using Service.UserInfo.Crud.Grpc;
 
 namespace Service.EducationApi.Controllers
 {
@@ -20,7 +21,10 @@ namespace Service.EducationApi.Controllers
 		private readonly ILogger<AuthController> _logger;
 		private readonly ILoginRequestValidator _loginRequestValidator;
 
-		public AuthController(ITokenService tokenService, ILogger<AuthController> logger, ILoginRequestValidator loginRequestValidator)
+		public AuthController(ITokenService tokenService, 
+			ILogger<AuthController> logger, 
+			ILoginRequestValidator loginRequestValidator, 
+			IUserInfoService userInfoService) : base(userInfoService)
 		{
 			_tokenService = tokenService;
 			_logger = logger;

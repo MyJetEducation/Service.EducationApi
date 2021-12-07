@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
@@ -12,7 +11,6 @@ using Service.KeyValue.Domain.Models;
 using Service.KeyValue.Grpc;
 using Service.KeyValue.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Contracts;
 using CommonResponse = Service.KeyValue.Grpc.Models.CommonResponse;
 
 namespace Service.EducationApi.Controllers
@@ -21,16 +19,11 @@ namespace Service.EducationApi.Controllers
 	[Route("/api/keyvalue/v1")]
 	public class KeyValueController : BaseController
 	{
-		private readonly IUserInfoService _userInfoService;
 		private readonly IKeyValueRepository _keyValueRepository;
-		private readonly ILogger<KeyValueController> _logger;
 
-		public KeyValueController(IUserInfoService userInfoService, IKeyValueRepository keyValueRepository, ILogger<KeyValueController> logger)
-		{
-			_userInfoService = userInfoService;
+		public KeyValueController(IUserInfoService userInfoService, IKeyValueRepository keyValueRepository)
+			: base(userInfoService) => 
 			_keyValueRepository = keyValueRepository;
-			_logger = logger;
-		}
 
 		[HttpPost("get")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
@@ -100,20 +93,6 @@ namespace Service.EducationApi.Controllers
 			});
 
 			return Result(response.IsSuccess);
-		}
-
-		private async ValueTask<Guid?> GetUserIdAsync()
-		{
-			string userName = User.Identity?.Name;
-
-			_logger.LogDebug("UserName from identity is {userName}", userName);
-
-			UserIdResponse userIdResponse = await _userInfoService.GetUserIdAsync(new UserInfoLoginRequest
-			{
-				UserName = userName
-			});
-
-			return userIdResponse?.UserId;
 		}
 	}
 }
