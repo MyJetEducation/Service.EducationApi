@@ -12,17 +12,10 @@
 
 		public const int NoResponseData = -4;
 
-		public const int UserAlreadyExists = -12;
-	}
+		public const int UserAlreadyExists = -5;
 
-	public class LoginRequestValidationResponseCode
-	{
-		public const int PasswordContainsNoDigit = -5;
+		public const int NotValidPassword = -6;
 
-		public const int PasswordContainsNoLetter = -6;
-
-		public const int PasswordInvalidLength = -10;
-
-		public const int NotValidEmail = -11;
+		public const int NotValidEmail = -7;
 	}
 }

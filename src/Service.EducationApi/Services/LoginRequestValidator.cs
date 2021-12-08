@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Text.RegularExpressions;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
@@ -8,18 +8,9 @@ namespace Service.EducationApi.Services
 {
 	public class LoginRequestValidator : ILoginRequestValidator
 	{
-		private const int PasswordMinLength = 8;
-		private const int PasswordMaxLength = 31;
+		private static readonly Regex PasswordRegex = new Regex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,31}$", RegexOptions.Compiled);
 
-		public int? ValidateRequest(LoginRequest request)
-		{
-			int? loginValidationResult = ValidateLogin(request.UserName);
-			if (loginValidationResult != null)
-				return loginValidationResult.Value;
-
-			int? passwordValidationResult = ValidatePassword(request.Password);
-			return passwordValidationResult;
-		}
+		public int? ValidateRequest(LoginRequest request) => ValidateLogin(request.UserName) ?? ValidatePassword(request.Password);
 
 		public int? ValidateLogin(string value)
 		{
@@ -27,7 +18,7 @@ namespace Service.EducationApi.Services
 				return ResponseCode.NoRequestData;
 
 			if (!new EmailAddressAttribute().IsValid(value))
-				return LoginRequestValidationResponseCode.NotValidEmail;
+				return ResponseCode.NotValidEmail;
 
 			return null;
 		}
@@ -37,14 +28,8 @@ namespace Service.EducationApi.Services
 			if (value.IsNullOrWhiteSpace())
 				return ResponseCode.NoRequestData;
 
-			if (value.Length < PasswordMinLength || value.Length > PasswordMaxLength)
-				return LoginRequestValidationResponseCode.PasswordInvalidLength;
-
-			if (!value.Any(char.IsDigit))
-				return LoginRequestValidationResponseCode.PasswordContainsNoDigit;
-
-			if (!value.Any(char.IsLetter))
-				return LoginRequestValidationResponseCode.PasswordContainsNoLetter;
+			if (!PasswordRegex.IsMatch(value))
+				return ResponseCode.NotValidPassword;
 
 			return null;
 		}
