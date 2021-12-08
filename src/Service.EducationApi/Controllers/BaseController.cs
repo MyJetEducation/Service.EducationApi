@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Service.EducationApi.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -8,6 +9,7 @@ using Service.UserInfo.Crud.Grpc.Contracts;
 
 namespace Service.EducationApi.Controllers
 {
+	[EnableCors("CorsApi")]
 	[ApiController]
 	public class BaseController : ControllerBase
 	{

@@ -23,6 +23,14 @@ namespace Service.EducationApi
 			services.ConfigurateHeaders();
 			services.AddControllers();
 
+			services.AddCors(options =>
+			{
+				options.AddPolicy("CorsApi",
+					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
+						.AllowAnyHeader()
+						.AllowAnyMethod());
+			});
+
 			services
 				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
 				.AddJwtBearer(StartupUtils.ConfigureJwtBearerOptions);
@@ -35,6 +43,7 @@ namespace Service.EducationApi
 
 			app.UseForwardedHeaders();
 			app.UseRouting();
+			app.UseCors("CorsApi"); //TODO: temporary
 			app.UseStaticFiles();
 			app.UseMetricServer();
 			app.BindServicesTree(Assembly.GetExecutingAssembly());
