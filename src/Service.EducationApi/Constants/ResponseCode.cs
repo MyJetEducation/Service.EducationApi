@@ -21,13 +21,7 @@
 
 		public const int PasswordContainsNoLetter = -6;
 
-		public const int PasswordContainsNoSymbol = -7;
-
-		public const int PasswordContainsNoUpper = -8;
-
-		public const int PasswordContainsNoLower = -9;
-
-		public const int PasswordTooShort = -10;
+		public const int PasswordInvalidLength = -10;
 
 		public const int NotValidEmail = -11;
 	}

@@ -9,6 +9,7 @@ namespace Service.EducationApi.Services
 	public class LoginRequestValidator : ILoginRequestValidator
 	{
 		private const int PasswordMinLength = 8;
+		private const int PasswordMaxLength = 31;
 
 		public int? ValidateRequest(LoginRequest request)
 		{
@@ -36,23 +37,14 @@ namespace Service.EducationApi.Services
 			if (value.IsNullOrWhiteSpace())
 				return ResponseCode.NoRequestData;
 
-			if (value.Length < PasswordMinLength)
-				return LoginRequestValidationResponseCode.PasswordTooShort;
+			if (value.Length < PasswordMinLength || value.Length > PasswordMaxLength)
+				return LoginRequestValidationResponseCode.PasswordInvalidLength;
 
 			if (!value.Any(char.IsDigit))
 				return LoginRequestValidationResponseCode.PasswordContainsNoDigit;
 
 			if (!value.Any(char.IsLetter))
 				return LoginRequestValidationResponseCode.PasswordContainsNoLetter;
-
-			if (!value.Any(char.IsSymbol))
-				return LoginRequestValidationResponseCode.PasswordContainsNoSymbol;
-
-			if (!value.Any(char.IsUpper))
-				return LoginRequestValidationResponseCode.PasswordContainsNoUpper;
-
-			if (!value.Any(char.IsLower))
-				return LoginRequestValidationResponseCode.PasswordContainsNoLower;
 
 			return null;
 		}
