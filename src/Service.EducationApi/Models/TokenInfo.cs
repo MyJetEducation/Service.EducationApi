@@ -1,4 +1,4 @@
-﻿using Service.UserInfo.Crud.Grpc.Contracts;
+﻿using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Models
 {

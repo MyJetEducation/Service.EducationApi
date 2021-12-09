@@ -8,7 +8,7 @@ using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Contracts;
+using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Controllers
 {
@@ -17,7 +17,7 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IUserInfoService _userInfoService;
 		private readonly ILoginRequestValidator _loginRequestValidator;
-		
+
 		public RegisterController(IUserInfoService userInfoService, ILoginRequestValidator loginRequestValidator) : base(userInfoService)
 		{
 			_userInfoService = userInfoService;
@@ -39,13 +39,13 @@ namespace Service.EducationApi.Controllers
 			if (userId != null)
 				return StatusResponse.Error(ResponseCode.UserAlreadyExists);
 
-			CommonResponse response = await _userInfoService.CreateUserInfoAsync(new UserInfoRegisterRequest
+			CommonGrpcResponse response = await _userInfoService.CreateUserInfoAsync(new UserInfoRegisterRequest
 			{
 				UserName = request.UserName,
 				Password = request.Password
 			});
 
-			return Result(response.IsSuccess);
+			return Result(response?.IsSuccess);
 		}
 
 		[HttpPost("confirm")]
@@ -58,9 +58,9 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			CommonResponse response = await _userInfoService.ConfirmUserInfoAsync(new UserInfoConfirmRequest {Hash = hash});
+			CommonGrpcResponse response = await _userInfoService.ConfirmUserInfoAsync(new UserInfoConfirmRequest {Hash = hash});
 
-			return Result(response.IsSuccess);
+			return Result(response?.IsSuccess);
 		}
 	}
 }

@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Service.EducationApi.Models;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Contracts;
 using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Services
@@ -68,7 +67,7 @@ namespace Service.EducationApi.Services
 
 			_logger.LogDebug("UserNewTokenInfoRequest for UpdateUserTokenInfoAsync: {answer}", JsonSerializer.Serialize(newTokenInfoRequest));
 
-			CommonResponse response = await _userInfoService.UpdateUserTokenInfoAsync(newTokenInfoRequest);
+			CommonGrpcResponse response = await _userInfoService.UpdateUserTokenInfoAsync(newTokenInfoRequest);
 
 			_logger.LogDebug("Answer for UpdateUserTokenInfoAsync: {answer}", JsonSerializer.Serialize(response));
 

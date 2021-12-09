@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
-using Service.KeyValue.Domain.Models;
 using Service.KeyValue.Grpc;
 using Service.KeyValue.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
-using CommonResponse = Service.KeyValue.Grpc.Models.CommonResponse;
 
 namespace Service.EducationApi.Controllers
 {
@@ -19,11 +17,11 @@ namespace Service.EducationApi.Controllers
 	[Route("/api/keyvalue/v1")]
 	public class KeyValueController : BaseController
 	{
-		private readonly IKeyValueRepository _keyValueRepository;
+		private readonly IKeyValueService _keyValueService;
 
-		public KeyValueController(IUserInfoService userInfoService, IKeyValueRepository keyValueRepository)
-			: base(userInfoService) => 
-			_keyValueRepository = keyValueRepository;
+		public KeyValueController(IUserInfoService userInfoService, IKeyValueService keyValueService)
+			: base(userInfoService) =>
+				_keyValueService = keyValueService;
 
 		[HttpPost("get")]
 		[ProducesResponseType(StatusCodes.Status200OK)]
@@ -37,13 +35,13 @@ namespace Service.EducationApi.Controllers
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
-			ItemsResponse itemsResponse = await _keyValueRepository.Get(new ItemsGetRequest
+			ItemsGrpcResponse itemsResponse = await _keyValueService.Get(new ItemsGetGrpcRequest
 			{
 				UserId = userId,
 				Keys = keys
 			});
 
-			KeyValueModel[] items = itemsResponse?.Items;
+			KeyValueGrpcModel[] items = itemsResponse?.Items;
 			if (items == null)
 				return StatusResponse.Error(ResponseCode.NoResponseData);
 
@@ -65,13 +63,13 @@ namespace Service.EducationApi.Controllers
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
-			CommonResponse response = await _keyValueRepository.Put(new ItemsPutRequest
+			CommonGrpcResponse response = await _keyValueService.Put(new ItemsPutGrpcRequest
 			{
 				UserId = userId,
-				Items = items?.Select(item => new KeyValueModel {Key = item.Key, Value = item.Value}).ToArray()
+				Items = items?.Select(item => new KeyValueGrpcModel {Key = item.Key, Value = item.Value}).ToArray()
 			});
 
-			return Result(response.IsSuccess);
+			return Result(response?.IsSuccess);
 		}
 
 		[HttpPost("delete")]
@@ -86,13 +84,13 @@ namespace Service.EducationApi.Controllers
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
-			CommonResponse response = await _keyValueRepository.Delete(new ItemsDeleteRequest
+			CommonGrpcResponse response = await _keyValueService.Delete(new ItemsDeleteGrpcRequest
 			{
 				UserId = userId,
 				Keys = keys
 			});
 
-			return Result(response.IsSuccess);
+			return Result(response?.IsSuccess);
 		}
 	}
 }

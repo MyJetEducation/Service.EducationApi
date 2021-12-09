@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Service.EducationApi.Models;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Contracts;
+using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Controllers
 {
@@ -17,8 +17,8 @@ namespace Service.EducationApi.Controllers
 
 		protected static void WaitFakeRequest() => Thread.Sleep(200);
 
-		protected static IActionResult Result(bool isSuccess) => isSuccess ? StatusResponse.Ok() : StatusResponse.Error();
-
+		protected static IActionResult Result(bool? isSuccess) => isSuccess == true ? StatusResponse.Ok() : StatusResponse.Error();
+		
 		protected async ValueTask<Guid?> GetUserIdAsync(string userName = null)
 		{
 			string identityName = userName ?? User.Identity?.Name;

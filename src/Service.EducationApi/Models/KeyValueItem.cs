@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Service.KeyValue.Domain.Models;
+using Service.KeyValue.Grpc.Models;
 
 namespace Service.EducationApi.Models
 {
 	public class KeyValueItem
 	{
-		public KeyValueItem(KeyValueModel model)
+		public KeyValueItem(KeyValueGrpcModel model)
 		{
 			Key = model.Key;
 			Value = model.Value;
