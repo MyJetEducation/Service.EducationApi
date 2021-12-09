@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -29,10 +28,10 @@ namespace Service.EducationApi.Controllers
 			QuestionGrpcResponse questions = await _userProfileService.GetQuestions();
 
 			QuestionDataGrpcModel[] questionsData = questions?.Data;
-			if (questionsData == null)
-				return StatusResponse.Error(ResponseCode.NoResponseData);
 
-			return DataResponse<string>.Ok(JsonConvert.SerializeObject(questionsData));
+			return questionsData == null
+				? StatusResponse.Error(ResponseCode.NoResponseData)
+				: DataResponse<QuestionDataGrpcModel[]>.Ok(questionsData);
 		}
 	}
 }
