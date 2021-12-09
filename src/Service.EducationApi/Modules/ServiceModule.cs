@@ -4,6 +4,7 @@ using Service.EducationApi.Services;
 using Service.KeyValue.Client;
 using Service.UserInfo.Crud.Client;
 using Service.UserInfo.Crud.Grpc;
+using Service.UserProfile.Client;
 
 namespace Service.EducationApi.Modules
 {
@@ -13,6 +14,7 @@ namespace Service.EducationApi.Modules
 		{
 			builder.RegisterUserInfoCrudClient(Program.Settings.UserInfoCrudServiceUrl);
 			builder.RegisterKeyValueClient(Program.Settings.KeyValueServiceUrl);
+			builder.RegisterUserProfileClient(Program.Settings.UserProfileServiceUrl);
 
 			builder.RegisterType<LoginRequestValidator>().AsImplementedInterfaces();
 

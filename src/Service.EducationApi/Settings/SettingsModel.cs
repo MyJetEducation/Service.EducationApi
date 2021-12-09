@@ -25,6 +25,9 @@ namespace Service.EducationApi.Settings
 
         [YamlProperty("EducationApi.KeyValueServiceUrl")]
         public string KeyValueServiceUrl { get; set; }
+        
+		[YamlProperty("EducationApi.UserProfileServiceUrl")]
+        public string UserProfileServiceUrl { get; set; }
 
         [YamlProperty("EducationApi.JwtAudience")]
         public string JwtAudience { get; set; }
