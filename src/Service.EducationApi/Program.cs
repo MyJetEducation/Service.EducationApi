@@ -26,11 +26,11 @@ namespace Service.EducationApi
 
 		public static void Main(string[] args)
 		{
-			Console.Title = "MyJetWallet Service.EducationApi";
+			Console.Title = "MyJetEducation Service.EducationApi";
 			LoadJwtSecret();
 			Settings = LoadSettings();
 
-			using ILoggerFactory loggerFactory = LogConfigurator.ConfigureElk("MyJetWallet", Settings.SeqServiceUrl, Settings.ElkLogs);
+			using ILoggerFactory loggerFactory = LogConfigurator.ConfigureElk("MyJetEducation", Settings.SeqServiceUrl, Settings.ElkLogs);
 			ILogger<Program> logger = loggerFactory.CreateLogger<Program>();
 			LogFactory = loggerFactory;
 

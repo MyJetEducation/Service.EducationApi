@@ -7,8 +7,11 @@ using Service.EducationApi.Constants;
 using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
+using Service.PasswordRecovery.Grpc;
+using Service.PasswordRecovery.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
 using Service.UserInfo.Crud.Grpc.Models;
+using CommonGrpcResponse = Service.UserInfo.Crud.Grpc.Models.CommonGrpcResponse;
 
 namespace Service.EducationApi.Controllers
 {
@@ -17,11 +20,15 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IUserInfoService _userInfoService;
 		private readonly ILoginRequestValidator _loginRequestValidator;
+		private readonly IPasswordRecoveryService _passwordRecoveryService;
 
-		public RegisterController(IUserInfoService userInfoService, ILoginRequestValidator loginRequestValidator) : base(userInfoService)
+		public RegisterController(IUserInfoService userInfoService, 
+			ILoginRequestValidator loginRequestValidator, 
+			IPasswordRecoveryService passwordRecoveryService) : base(userInfoService)
 		{
 			_userInfoService = userInfoService;
 			_loginRequestValidator = loginRequestValidator;
+			_passwordRecoveryService = passwordRecoveryService;
 		}
 
 		[HttpPost("create")]
@@ -59,6 +66,39 @@ namespace Service.EducationApi.Controllers
 			}
 
 			CommonGrpcResponse response = await _userInfoService.ConfirmUserInfoAsync(new UserInfoConfirmRequest {Hash = hash});
+
+			return Result(response?.IsSuccess);
+		}
+
+		[HttpPost("recovery")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public async ValueTask<IActionResult> PasswordRecovery([FromBody, Required] string email)
+		{
+			if (email.IsNullOrWhiteSpace())
+			{
+				WaitFakeRequest();
+				return StatusResponse.Error(ResponseCode.NoRequestData);
+			}
+
+			PasswordRecovery.Grpc.Models.CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest { Email = email });
+
+			return Result(response?.IsSuccess);
+		}
+
+		[HttpPost("change")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public async ValueTask<IActionResult> ChangePassword([FromBody, Required] ChangePasswordRequest request)
+		{
+			string password = request.Password;
+			string hash = request.Hash;
+
+			if (password.IsNullOrWhiteSpace() || hash.IsNullOrWhiteSpace())
+			{
+				WaitFakeRequest();
+				return StatusResponse.Error(ResponseCode.NoRequestData);
+			}
+
+			PasswordRecovery.Grpc.Models.CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest { Password = password, Hash = hash });
 
 			return Result(response?.IsSuccess);
 		}
