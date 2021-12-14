@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Service.Core.Domain.Extensions;
 using Service.EducationApi.Constants;
-using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 
 namespace Service.EducationApi.Services

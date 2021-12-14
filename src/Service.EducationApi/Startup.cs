@@ -56,11 +56,7 @@ namespace Service.EducationApi
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-
-				endpoints.MapGet("/", async context =>
-				{
-					await context.Response.WriteAsync("Api endpoint");
-				});
+				endpoints.MapGet("/", async context => await context.Response.WriteAsync("Api endpoint"));
 			});
 		}
 

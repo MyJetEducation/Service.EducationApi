@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyJetWallet.Sdk.Service;
 using MySettingsReader;
-using Service.EducationApi.Extensions;
+using Service.Core.Domain.Extensions;
 using Service.EducationApi.Settings;
 
 namespace Service.EducationApi

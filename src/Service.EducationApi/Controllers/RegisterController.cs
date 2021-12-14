@@ -3,15 +3,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Service.Core.Domain.Extensions;
+using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
-using Service.EducationApi.Extensions;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
 using Service.PasswordRecovery.Grpc;
 using Service.PasswordRecovery.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
 using Service.UserInfo.Crud.Grpc.Models;
-using CommonGrpcResponse = Service.UserInfo.Crud.Grpc.Models.CommonGrpcResponse;
 
 namespace Service.EducationApi.Controllers
 {
@@ -80,7 +80,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			PasswordRecovery.Grpc.Models.CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest { Email = email });
+			CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest { Email = email });
 
 			return Result(response?.IsSuccess);
 		}
@@ -98,7 +98,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			PasswordRecovery.Grpc.Models.CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest { Password = password, Hash = hash });
+			CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest { Password = password, Hash = hash });
 
 			return Result(response?.IsSuccess);
 		}

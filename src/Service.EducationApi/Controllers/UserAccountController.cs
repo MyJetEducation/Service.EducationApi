@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
 using Service.EducationApi.Models;
