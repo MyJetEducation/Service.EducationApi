@@ -23,7 +23,7 @@ namespace Service.EducationApi.Services
 			return null;
 		}
 
-		private static int? ValidatePassword(string value)
+		public int? ValidatePassword(string value)
 		{
 			if (value.IsNullOrWhiteSpace())
 				return ResponseCode.NoRequestData;

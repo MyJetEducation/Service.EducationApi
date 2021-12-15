@@ -90,13 +90,19 @@ namespace Service.EducationApi.Controllers
 		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async ValueTask<IActionResult> ChangePassword([FromBody, Required] ChangePasswordRequest request)
 		{
-			string password = request.Password;
 			string hash = request.Hash;
-
-			if (password.IsNullOrWhiteSpace() || hash.IsNullOrWhiteSpace())
+			if (hash.IsNullOrWhiteSpace())
 			{
 				WaitFakeRequest();
 				return StatusResponse.Error(ResponseCode.NoRequestData);
+			}
+
+			string password = request.Password;
+			int? validationResult = _loginRequestValidator.ValidatePassword(password);
+			if (validationResult != null)
+			{
+				WaitFakeRequest();
+				return StatusResponse.Error(validationResult.Value);
 			}
 
 			CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest {Password = password, Hash = hash});

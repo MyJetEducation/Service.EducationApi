@@ -8,6 +8,8 @@ namespace Service.EducationApi.Services
 
 		int? ValidateLogin(string value);
 
+		int? ValidatePassword(string value);
+
 		bool ValidateRequired(LoginRequest request);
 	}
 }
