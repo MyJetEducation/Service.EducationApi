@@ -32,6 +32,9 @@ namespace Service.EducationApi.Settings
         [YamlProperty("EducationApi.PasswordRecoveryServiceUrl")]
         public string PasswordRecoveryServiceUrl { get; set; }
 
+        [YamlProperty("EducationApi.RegistrationServiceUrl")]
+        public string RegistrationServiceUrl { get; set; }
+
         [YamlProperty("EducationApi.JwtAudience")]
         public string JwtAudience { get; set; }
     }

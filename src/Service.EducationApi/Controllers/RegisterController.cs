@@ -10,25 +10,26 @@ using Service.EducationApi.Models;
 using Service.EducationApi.Services;
 using Service.PasswordRecovery.Grpc;
 using Service.PasswordRecovery.Grpc.Models;
+using Service.Registration.Grpc;
+using Service.Registration.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationApi.Controllers
 {
 	[Route("/api/register/v1")]
 	public class RegisterController : BaseController
 	{
-		private readonly IUserInfoService _userInfoService;
 		private readonly ILoginRequestValidator _loginRequestValidator;
 		private readonly IPasswordRecoveryService _passwordRecoveryService;
+		private readonly IRegistrationService _registrationService;
 
-		public RegisterController(IUserInfoService userInfoService, 
-			ILoginRequestValidator loginRequestValidator, 
-			IPasswordRecoveryService passwordRecoveryService) : base(userInfoService)
+		public RegisterController(IUserInfoService userInfoService,
+			ILoginRequestValidator loginRequestValidator,
+			IPasswordRecoveryService passwordRecoveryService, IRegistrationService registrationService) : base(userInfoService)
 		{
-			_userInfoService = userInfoService;
 			_loginRequestValidator = loginRequestValidator;
 			_passwordRecoveryService = passwordRecoveryService;
+			_registrationService = registrationService;
 		}
 
 		[HttpPost("create")]
@@ -46,7 +47,7 @@ namespace Service.EducationApi.Controllers
 			if (userId != null)
 				return StatusResponse.Error(ResponseCode.UserAlreadyExists);
 
-			CommonGrpcResponse response = await _userInfoService.CreateUserInfoAsync(new UserInfoRegisterRequest
+			CommonGrpcResponse response = await _registrationService.RegistrationAsync(new RegistrationGrpcRequest
 			{
 				UserName = request.UserName,
 				Password = request.Password
@@ -65,7 +66,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			CommonGrpcResponse response = await _userInfoService.ConfirmUserInfoAsync(new UserInfoConfirmRequest {Hash = hash});
+			CommonGrpcResponse response = await _registrationService.ConfirmRegistrationAsync(new ConfirmRegistrationGrpcRequest {Hash = hash});
 
 			return Result(response?.IsSuccess);
 		}
@@ -80,7 +81,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest { Email = email });
+			CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest {Email = email});
 
 			return Result(response?.IsSuccess);
 		}
@@ -98,7 +99,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest { Password = password, Hash = hash });
+			CommonGrpcResponse response = await _passwordRecoveryService.Change(new ChangePasswordGrpcRequest {Password = password, Hash = hash});
 
 			return Result(response?.IsSuccess);
 		}

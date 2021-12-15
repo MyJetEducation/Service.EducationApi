@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Service.EducationApi.Services;
 using Service.KeyValue.Client;
 using Service.PasswordRecovery.Client;
+using Service.Registration.Client;
 using Service.UserInfo.Crud.Client;
 using Service.UserInfo.Crud.Grpc;
 using Service.UserProfile.Client;
@@ -17,6 +18,7 @@ namespace Service.EducationApi.Modules
 			builder.RegisterKeyValueClient(Program.Settings.KeyValueServiceUrl);
 			builder.RegisterUserProfileClient(Program.Settings.UserProfileServiceUrl);
 			builder.RegisterPasswordRecoveryClient(Program.Settings.PasswordRecoveryServiceUrl);
+			builder.RegisterRegistrationClient(Program.Settings.RegistrationServiceUrl);
 
 			builder.RegisterType<LoginRequestValidator>().AsImplementedInterfaces();
 
