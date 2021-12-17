@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="MyJetEducation.Service.KeyValue.Client" Version="1.0.3" />
+    <PackageReference Include="MyJetEducation.Service.KeyValue.Client" Version="1.0.4" />
     <PackageReference Include="MyJetEducation.Service.PasswordRecovery.Client" Version="1.0.2" />
     <PackageReference Include="MyJetEducation.Service.Registration.Client" Version="1.0.1" />
     <PackageReference Include="MyJetEducation.Service.UserInfo.Crud.Client" Version="1.0.10" />
