@@ -93,5 +93,28 @@ namespace Service.EducationApi.Controllers
 
 			return Result(response?.IsSuccess);
 		}
+
+		[HttpPost("keys")]
+		[ProducesResponseType(StatusCodes.Status200OK)]
+		public async ValueTask<IActionResult> GetKeys()
+		{
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			KeysGrpcResponse keysResponse = await _keyValueService.GetKeys(new GetKeysGrpcRequest
+			{
+				UserId = userId,
+			});
+
+			string[] items = keysResponse?.Keys;
+			if (items == null)
+				return StatusResponse.Error(ResponseCode.NoResponseData);
+
+			return DataResponse<KeysResponse>.Ok(new KeysResponse
+			{
+				Keys = items
+			});
+		}
 	}
 }
