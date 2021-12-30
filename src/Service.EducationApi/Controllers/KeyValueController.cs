@@ -8,6 +8,7 @@ using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
+using Service.EducationApi.Models.KeyValueModels;
 using Service.KeyValue.Grpc;
 using Service.KeyValue.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -16,6 +17,7 @@ namespace Service.EducationApi.Controllers
 {
 	[Authorize]
 	[Route("/api/keyvalue/v1")]
+	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public class KeyValueController : BaseController
 	{
 		private readonly IKeyValueService _keyValueService;
@@ -25,7 +27,6 @@ namespace Service.EducationApi.Controllers
 				_keyValueService = keyValueService;
 
 		[HttpPost("get")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async ValueTask<IActionResult> GetAsync([FromBody] KeysRequest keysRequest)
 		{
 			string[] keys = keysRequest?.Keys;
@@ -53,7 +54,6 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("put")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async ValueTask<IActionResult> PutAsync([FromBody] KeyValueList keyValueList)
 		{
 			KeyValueItem[] items = keyValueList?.Items;
@@ -74,7 +74,6 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("delete")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
 		public async ValueTask<IActionResult> DeleteAsync([FromBody] KeysRequest keysRequest)
 		{
 			string[] keys = keysRequest?.Keys;
@@ -95,8 +94,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("keys")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> GetKeys()
+		public async ValueTask<IActionResult> GetKeysAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
 			if (userId == null)

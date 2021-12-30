@@ -1,4 +1,4 @@
-﻿namespace Service.EducationApi.Models
+﻿namespace Service.EducationApi.Models.KeyValueModels
 {
 	public class KeysResponse
 	{

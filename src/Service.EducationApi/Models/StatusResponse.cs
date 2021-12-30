@@ -18,5 +18,11 @@ namespace Service.EducationApi.Models
 			{
 				Status = ResponseCode.Ok
 			});
+
+		public static IActionResult Result(bool isSuccess) => new OkObjectResult(
+			new StatusResponse
+			{
+				Status = isSuccess ? ResponseCode.Ok : ResponseCode.Fail
+			});
 	}
 }

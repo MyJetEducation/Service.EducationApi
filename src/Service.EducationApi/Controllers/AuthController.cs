@@ -33,10 +33,8 @@ namespace Service.EducationApi.Controllers
 
 		[AllowAnonymous]
 		[HttpPost("login")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-		public async ValueTask<IActionResult> Login([FromBody] LoginRequest request)
+		public async ValueTask<IActionResult> LoginAsync([FromBody] LoginRequest request)
 		{
 			if (_loginRequestValidator.ValidateRequired(request))
 			{
@@ -53,10 +51,8 @@ namespace Service.EducationApi.Controllers
 
 		[AllowAnonymous]
 		[HttpPost("refresh-token")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
 		[ProducesResponseType(StatusCodes.Status403Forbidden)]
-		[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-		public async ValueTask<IActionResult> RefreshToken([FromBody, Required] string refreshToken)
+		public async ValueTask<IActionResult> RefreshTokenAsync([FromBody, Required] string refreshToken)
 		{
 			if (refreshToken.IsNullOrWhiteSpace())
 			{
@@ -64,7 +60,7 @@ namespace Service.EducationApi.Controllers
 				return StatusResponse.Error(ResponseCode.NoRequestData);
 			}
 
-			_logger.LogDebug("RefreshToken is: {token}", refreshToken);
+			_logger.LogDebug("RefreshTokenAsync is: {token}", refreshToken);
 
 			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, GetIpAddress());
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
@@ -33,8 +32,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("create")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> Register([FromBody] LoginRequest request)
+		public async ValueTask<IActionResult> RegisterAsync([FromBody] LoginRequest request)
 		{
 			int? validationResult = _loginRequestValidator.ValidateRequest(request);
 			if (validationResult != null)
@@ -57,8 +55,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("confirm")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> ConfirmRegister([FromBody, Required] string hash)
+		public async ValueTask<IActionResult> ConfirmRegisterAsync([FromBody, Required] string hash)
 		{
 			if (hash.IsNullOrWhiteSpace())
 			{
@@ -72,8 +69,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("recovery")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> PasswordRecovery([FromBody, Required] string email)
+		public async ValueTask<IActionResult> PasswordRecoveryAsync([FromBody, Required] string email)
 		{
 			if (email.IsNullOrWhiteSpace())
 			{
@@ -87,8 +83,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("change")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> ChangePassword([FromBody, Required] ChangePasswordRequest request)
+		public async ValueTask<IActionResult> ChangePasswordAsync([FromBody, Required] ChangePasswordRequest request)
 		{
 			string hash = request.Hash;
 			if (hash.IsNullOrWhiteSpace())

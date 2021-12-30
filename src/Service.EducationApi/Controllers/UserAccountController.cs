@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
@@ -23,8 +22,7 @@ namespace Service.EducationApi.Controllers
 			_userProfileService = userProfileService;
 
 		[HttpPost("get")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> GetAccount()
+		public async ValueTask<IActionResult> GetAccountAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
 			if (userId == null)
@@ -40,8 +38,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("put")]
-		[ProducesResponseType(StatusCodes.Status200OK)]
-		public async ValueTask<IActionResult> SaveAccount([FromBody] UserAccount account)
+		public async ValueTask<IActionResult> SaveAccountAsync([FromBody] UserAccount account)
 		{
 			Guid? userId = await GetUserIdAsync();
 			if (userId == null)

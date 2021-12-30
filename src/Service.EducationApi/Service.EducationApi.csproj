@@ -32,6 +32,7 @@
     <PackageReference Include="MySettingsReader" Version="1.2.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.2.3" />
     <PackageReference Include="MyJetEducation.Service.Core.Client" Version="1.0.8" />
+    <PackageReference Include="SimpleTrading.UserAgent" Version="1.0.10" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +48,7 @@
 
   <ItemGroup>
     <Folder Include="Mappers\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

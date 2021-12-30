@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.EducationApi.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -11,6 +12,8 @@ namespace Service.EducationApi.Controllers
 {
 	[EnableCors("CorsApi")]
 	[ApiController]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 	public class BaseController : ControllerBase
 	{
 		protected readonly IUserInfoService UserInfoService;

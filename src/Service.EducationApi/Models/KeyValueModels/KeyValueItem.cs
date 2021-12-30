@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Service.KeyValue.Grpc.Models;
 
-namespace Service.EducationApi.Models
+namespace Service.EducationApi.Models.KeyValueModels
 {
 	public class KeyValueItem
 	{

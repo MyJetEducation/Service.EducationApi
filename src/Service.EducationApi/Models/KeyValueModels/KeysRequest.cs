@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Service.EducationApi.Models
+namespace Service.EducationApi.Models.KeyValueModels
 {
 	public class KeysRequest
 	{
