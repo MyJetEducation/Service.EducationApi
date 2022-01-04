@@ -11,7 +11,7 @@ namespace Service.EducationApi.Models
 			new DataResponse<T>
 			{
 				Data = data,
-				Status = ResponseCode.Ok
+				Status = data == null ? ResponseCode.Fail : ResponseCode.Ok
 			});
 	}
 }

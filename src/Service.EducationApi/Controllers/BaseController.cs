@@ -14,11 +14,11 @@ namespace Service.EducationApi.Controllers
 	[ApiController]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-	public class BaseController : ControllerBase
+	public abstract class BaseController : ControllerBase
 	{
 		protected readonly IUserInfoService UserInfoService;
 
-		public BaseController(IUserInfoService userInfoService) => UserInfoService = userInfoService;
+		protected BaseController(IUserInfoService userInfoService) => UserInfoService = userInfoService;
 
 		protected static void WaitFakeRequest() => Thread.Sleep(200);
 

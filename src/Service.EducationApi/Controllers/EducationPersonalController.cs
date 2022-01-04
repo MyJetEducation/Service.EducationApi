@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
+using Service.EducationApi.Models;
 using Service.EducationApi.Models.TaskModels;
 using Service.TutorialPersonal.Grpc;
 using Service.TutorialPersonal.Grpc.Models;
@@ -22,33 +24,33 @@ namespace Service.EducationApi.Controllers
 		public EducationPersonalController(IUserInfoService userInfoService, ITutorialPersonalService tutorialService) : base(userInfoService) => _tutorialService = tutorialService;
 
 		[HttpPost("/dashboard")]
-		public async ValueTask<PersonalStateResponse> GetDashboardStateAsync()
+		public async ValueTask<IActionResult> GetDashboardStateAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
 			if (userId == null)
-				return new PersonalStateResponse {Available = false};
+				return StatusResponse.Error(ResponseCode.UserNotFound);
 
 			PersonalStateGrpcResponse response = await _tutorialService.GetDashboardStateAsync(new PersonalSelectTaskUnitGrpcRequest {UserId = userId});
 
-			return response.ToModel();
+			return DataResponse<PersonalStateResponse>.Ok(response.ToModel());
 		}
 
 		#region Unit1 (Your income)
 
 		[HttpPost("/unit1/text")]
-		public async ValueTask<TestScoreResponse> Unit1TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit1TextAsync(request.ToGrpcModel(userId)));
+		public async ValueTask<IActionResult> Unit1TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit1TextAsync(request.ToGrpcModel(userId)));
 
 		[HttpPost("/unit1/test")]
-		public async ValueTask<TestScoreResponse> Unit1TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit1TestAsync(request.ToGrpcModel(userId)));
+		public async ValueTask<IActionResult> Unit1TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit1TestAsync(request.ToGrpcModel(userId)));
 
 		[HttpPost("/unit1/case")]
-		public async ValueTask<TestScoreResponse> Unit1CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit1CaseAsync(request.ToGrpcModel(userId)));
+		public async ValueTask<IActionResult> Unit1CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit1CaseAsync(request.ToGrpcModel(userId)));
 
 		[HttpPost("/unit1/truefalse")]
-		public async ValueTask<TestScoreResponse> Unit1TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit1TrueFalseAsync(request.ToGrpcModel(userId)));
+		public async ValueTask<IActionResult> Unit1TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit1TrueFalseAsync(request.ToGrpcModel(userId)));
 
 		[HttpPost("/unit1/game")]
-		public async ValueTask<TestScoreResponse> Unit1GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit1GameAsync(request.ToGrpcModel(userId)));
+		public async ValueTask<IActionResult> Unit1GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit1GameAsync(request.ToGrpcModel(userId)));
 
 		#endregion
 
@@ -128,15 +130,15 @@ namespace Service.EducationApi.Controllers
 
 		#endregion
 
-		private async ValueTask<TestScoreResponse> Process(Func<Guid?, ValueTask<TestScoreGrpcResponse>> action)
+		private async ValueTask<IActionResult> Process(Func<Guid?, ValueTask<TestScoreGrpcResponse>> action)
 		{
 			Guid? userId = await GetUserIdAsync();
 			if (userId == null)
-				return new TestScoreResponse {IsSuccess = false};
+				return StatusResponse.Error(ResponseCode.UserNotFound);
 
 			TestScoreGrpcResponse response = await action.Invoke(userId);
 
-			return response.ToModel();
+			return DataResponse<TestScoreResponse>.Ok(response.ToModel());
 		}
 	}
 }
