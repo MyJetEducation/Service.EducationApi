@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.EducationApi.Constants;
@@ -16,6 +17,7 @@ using Service.UserInfo.Crud.Grpc;
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
+	[EnableCors("CorsApi")]
 	[Route("/api/education/personal/v1")]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public class EducationPersonalController : BaseController

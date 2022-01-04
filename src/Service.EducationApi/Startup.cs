@@ -3,7 +3,6 @@ using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyJetWallet.Sdk.Service;
@@ -22,9 +21,16 @@ namespace Service.EducationApi
 			services.AddMyTelemetry("ED-", Program.Settings.ZipkinUrl);
 			services.SetupSwaggerDocumentation();
 			services.ConfigurateHeaders();
-			services.AddCors();
 			services.AddControllers();
-			
+
+			services.AddCors(options =>
+			{
+				options.AddPolicy("CorsApi",
+					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
+						.AllowAnyHeader()
+						.AllowAnyMethod());
+			});
+
 			services
 				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
 				.AddJwtBearer(StartupUtils.ConfigureJwtBearerOptions);
@@ -37,7 +43,7 @@ namespace Service.EducationApi
 
 			app.UseForwardedHeaders();
 			app.UseRouting();
-			app.UseCors(options => options.WithOrigins("http://localhost:3000", "http://localhost").AllowAnyMethod()); //TODO: temporary
+			app.UseCors("CorsApi"); //TODO: temporary
 			app.UseStaticFiles();
 			app.UseMetricServer();
 			app.BindServicesTree(Assembly.GetExecutingAssembly());

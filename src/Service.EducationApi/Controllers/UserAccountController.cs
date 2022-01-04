@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
@@ -13,6 +14,7 @@ using Service.UserProfile.Grpc.Models;
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
+	[EnableCors("CorsApi")]
 	[Route("api/useraccount/v1")]
 	public class UserAccountController : BaseController
 	{
