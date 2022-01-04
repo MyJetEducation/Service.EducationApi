@@ -10,5 +10,7 @@ namespace Service.EducationApi.Models.TaskModels
 		public TimeSpan Duration { get; set; }
 
 		public IEnumerable<PersonalStateUnit> Units { get; set; }
+
+		public TotalProgressResponse TotalProgress { get; set; }
 	}
 }

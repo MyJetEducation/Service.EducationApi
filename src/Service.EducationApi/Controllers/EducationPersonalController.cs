@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,18 @@ namespace Service.EducationApi.Controllers
 			PersonalStateGrpcResponse response = await _tutorialService.GetDashboardStateAsync(new PersonalSelectTaskUnitGrpcRequest {UserId = userId});
 
 			return DataResponse<PersonalStateResponse>.Ok(response.ToModel());
+		}
+
+		[HttpPost("/state")]
+		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody, Required] int unitId)
+		{
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			FinishUnitGrpcResponse response = await _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unitId});
+
+			return DataResponse<FinishUnitResponse>.Ok(response.ToModel());
 		}
 
 		#region Unit1 (Your income)
