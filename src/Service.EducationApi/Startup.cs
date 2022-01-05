@@ -26,7 +26,7 @@ namespace Service.EducationApi
 			services.AddCors(options => //TODO: temporary
 			{
 				options.AddPolicy("CorsApi",
-					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
+					builder => builder.WithOrigins("http://localhost:3000", "http://localhost", "http://www.umciscult74.ru", "http://umciscult74.ru")
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
