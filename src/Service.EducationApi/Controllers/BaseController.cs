@@ -41,19 +41,5 @@ namespace Service.EducationApi.Controllers
 
 			return userInfoResponse?.UserInfo?.UserId;
 		}
-
-		protected string GetIpAddress()
-		{
-			string requestHeader = Request.Headers.ContainsKey("X-Forwarded-For")
-				? (string) Request.Headers["X-Forwarded-For"]
-				: HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
-
-			if (requestHeader == null)
-				throw new Exception("Can't obtain user IP address. Skip request");
-
-			Logger.LogDebug("User IP is: {ip}", requestHeader);
-
-			return requestHeader;
-		}
 	}
 }

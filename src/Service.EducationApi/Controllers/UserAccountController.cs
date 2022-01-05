@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
@@ -15,6 +17,8 @@ namespace Service.EducationApi.Controllers
 {
 	[Authorize]
 	[Route("api/useraccount/v1")]
+	[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
+	[OpenApiTag("UserAccount", Description = "user account")]
 	public class UserAccountController : BaseController
 	{
 		private readonly IUserProfileService _userProfileService;
@@ -25,6 +29,7 @@ namespace Service.EducationApi.Controllers
 			: base(userInfoService, logger) => _userProfileService = userProfileService;
 
 		[HttpPost("get")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<UserAccount>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetAccountAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
@@ -41,6 +46,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("put")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (StatusResponse), Description = "Status")]
 		public async ValueTask<IActionResult> SaveAccountAsync([FromBody] UserAccount account)
 		{
 			Guid? userId = await GetUserIdAsync();

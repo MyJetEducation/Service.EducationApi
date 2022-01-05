@@ -1,9 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
@@ -14,10 +16,12 @@ using Service.PasswordRecovery.Grpc.Models;
 using Service.Registration.Grpc;
 using Service.Registration.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
+using SimpleTrading.ClientApi.Utils;
 
 namespace Service.EducationApi.Controllers
 {
 	[Route("/api/register/v1")]
+	[OpenApiTag("Register", Description = "user registration")]
 	public class RegisterController : BaseController
 	{
 		private readonly ILoginRequestValidator _loginRequestValidator;
@@ -39,6 +43,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("create")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(StatusResponse), Description = "Ok")]
 		public async ValueTask<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
 		{
 			int? validationResult = _loginRequestValidator.ValidateRegisterRequest(request);
@@ -63,7 +68,8 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("confirm")]
-		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TokenInfo>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
 		public async ValueTask<IActionResult> ConfirmRegisterAsync([FromBody, Required] string hash)
 		{
 			ConfirmRegistrationGrpcResponse response = await _registrationService.ConfirmRegistrationAsync(new ConfirmRegistrationGrpcRequest {Hash = hash});
@@ -72,13 +78,14 @@ namespace Service.EducationApi.Controllers
 			if (userName.IsNullOrEmpty())
 				return StatusResponse.Error();
 
-			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(userName, GetIpAddress());
+			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(userName, HttpContext.GetIp());
 			return tokenInfo != null
 				? DataResponse<TokenInfo>.Ok(tokenInfo)
 				: Unauthorized();
 		}
 
 		[HttpPost("recovery")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(StatusResponse), Description = "Ok")]
 		public async ValueTask<IActionResult> PasswordRecoveryAsync([FromBody, Required] string email)
 		{
 			CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest {Email = email});
@@ -87,6 +94,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("change")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(StatusResponse), Description = "Ok")]
 		public async ValueTask<IActionResult> ChangePasswordAsync([FromBody, Required] ChangePasswordRequest request)
 		{
 			string hash = request.Hash;

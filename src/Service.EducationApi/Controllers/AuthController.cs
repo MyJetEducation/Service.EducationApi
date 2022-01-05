@@ -1,38 +1,35 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Service.Core.Domain.Extensions;
-using Service.EducationApi.Constants;
+using NSwag.Annotations;
 using Service.EducationApi.Models;
 using Service.EducationApi.Services;
 using Service.UserInfo.Crud.Grpc;
+using SimpleTrading.ClientApi.Utils;
 
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
 	[Route("/api/auth/v1")]
+	[OpenApiTag("Auth", Description = "user authorization")]
 	public class AuthController : BaseController
 	{
 		private readonly ITokenService _tokenService;
-		private readonly ILogger<AuthController> _logger;
 
 		public AuthController(ITokenService tokenService,
 			ILogger<AuthController> logger,
-			IUserInfoService userInfoService) : base(userInfoService, logger)
-		{
-			_tokenService = tokenService;
-			_logger = logger;
-		}
+			IUserInfoService userInfoService) : base(userInfoService, logger) => _tokenService = tokenService;
 
 		[AllowAnonymous]
 		[HttpPost("login")]
-		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (TokenInfo), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
 		public async ValueTask<IActionResult> LoginAsync([FromBody] LoginRequest request)
 		{
-			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(request.UserName, GetIpAddress(), request.Password);
+			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(request.UserName, HttpContext.GetIp(), request.Password);
 
 			return tokenInfo != null
 				? DataResponse<TokenInfo>.Ok(tokenInfo)
@@ -41,18 +38,11 @@ namespace Service.EducationApi.Controllers
 
 		[AllowAnonymous]
 		[HttpPost("refresh-token")]
-		[ProducesResponseType(StatusCodes.Status403Forbidden)]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (TokenInfo), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.Forbidden, null, Description = "Forbidden")]
 		public async ValueTask<IActionResult> RefreshTokenAsync([FromBody, Required] string refreshToken)
 		{
-			if (refreshToken.IsNullOrWhiteSpace())
-			{
-				WaitFakeRequest();
-				return StatusResponse.Error(ResponseCode.NoRequestData);
-			}
-
-			_logger.LogDebug("RefreshTokenAsync is: {token}", refreshToken);
-
-			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, GetIpAddress());
+			TokenInfo info = await _tokenService.RefreshTokensAsync(refreshToken, HttpContext.GetIp());
 
 			return info == null
 				? Forbid()

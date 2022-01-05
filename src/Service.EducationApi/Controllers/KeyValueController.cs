@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
@@ -18,7 +19,8 @@ namespace Service.EducationApi.Controllers
 {
 	[Authorize]
 	[Route("/api/keyvalue/v1")]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
+	[OpenApiTag("KeyValue", Description = "key-value common storage")]
 	public class KeyValueController : BaseController
 	{
 		private readonly IKeyValueService _keyValueService;
@@ -29,6 +31,7 @@ namespace Service.EducationApi.Controllers
 			: base(userInfoService, logger) => _keyValueService = keyValueService;
 
 		[HttpPost("get")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<KeyValueList>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetAsync([FromBody] KeysRequest keysRequest)
 		{
 			string[] keys = keysRequest?.Keys;
@@ -56,6 +59,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("put")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(StatusResponse), Description = "Ok")]
 		public async ValueTask<IActionResult> PutAsync([FromBody] KeyValueList keyValueList)
 		{
 			KeyValueItem[] items = keyValueList?.Items;
@@ -76,6 +80,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("delete")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(StatusResponse), Description = "Ok")]
 		public async ValueTask<IActionResult> DeleteAsync([FromBody] KeysRequest keysRequest)
 		{
 			string[] keys = keysRequest?.Keys;
@@ -96,6 +101,7 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("keys")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<KeysResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetKeysAsync()
 		{
 			Guid? userId = await GetUserIdAsync();

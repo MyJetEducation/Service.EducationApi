@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NSwag.Annotations;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
 using Service.EducationApi.Models;
@@ -17,7 +18,8 @@ namespace Service.EducationApi.Controllers
 {
 	[Authorize]
 	[Route("/api/education/personal/v1")]
-	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+	[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
+	[OpenApiTag("EducationPersonal", Description = "personal finance tutorial")]
 	public class EducationPersonalController : BaseController
 	{
 		private readonly ITutorialPersonalService _tutorialService;
@@ -28,28 +30,35 @@ namespace Service.EducationApi.Controllers
 			: base(userInfoService, logger) => _tutorialService = tutorialService;
 
 		[HttpPost("/dashboard")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<PersonalStateResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetDashboardStateAsync() =>
 			await Process(userId => _tutorialService.GetDashboardStateAsync(new PersonalSelectTaskUnitGrpcRequest {UserId = userId}), grpc => grpc.ToModel());
 
 		[HttpPost("/state")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<FinishUnitResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody, Required] int unit) =>
 			await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unit}), grpc => grpc.ToModel());
 
 		#region Unit1 (Your income)
 
 		[HttpPost("/unit1/text")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit1TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		[HttpPost("/unit1/test")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit1TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		[HttpPost("/unit1/case")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit1CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		[HttpPost("/unit1/truefalse")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit1TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		[HttpPost("/unit1/game")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit1GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		#endregion
