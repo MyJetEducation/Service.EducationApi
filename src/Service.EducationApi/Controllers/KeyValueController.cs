@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
@@ -22,9 +23,10 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IKeyValueService _keyValueService;
 
-		public KeyValueController(IUserInfoService userInfoService, IKeyValueService keyValueService)
-			: base(userInfoService) =>
-				_keyValueService = keyValueService;
+		public KeyValueController(IUserInfoService userInfoService,
+			IKeyValueService keyValueService,
+			ILogger<KeyValueController> logger)
+			: base(userInfoService, logger) => _keyValueService = keyValueService;
 
 		[HttpPost("get")]
 		public async ValueTask<IActionResult> GetAsync([FromBody] KeysRequest keysRequest)

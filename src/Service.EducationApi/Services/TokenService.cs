@@ -31,9 +31,9 @@ namespace Service.EducationApi.Services
 			_logger = logger;
 		}
 
-		public async ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request, string ipAddress)
+		public async ValueTask<TokenInfo> GenerateTokensAsync(string userName, string ipAddress, string password = null)
 		{
-			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest { UserName = request.UserName, Password = request.Password });
+			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest {UserName = userName, Password = password});
 			UserInfoGrpcModel authInfo = userInfo?.UserInfo;
 
 			_logger.LogDebug("Answer for GetUserInfoByLoginAsync: {answer}", JsonSerializer.Serialize(userInfo));
@@ -45,7 +45,7 @@ namespace Service.EducationApi.Services
 
 		public async ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken, string ipAddress)
 		{
-			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken });
+			UserInfoResponse userInfo = await _userInfoService.GetUserInfoByTokenAsync(new UserInfoTokenRequest {RefreshToken = currentRefreshToken});
 			UserInfoGrpcModel authInfo = userInfo?.UserInfo;
 
 			_logger.LogDebug("Answer for GetUserInfoByTokenAsync: {answer}", JsonSerializer.Serialize(userInfo));

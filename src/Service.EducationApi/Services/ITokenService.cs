@@ -5,7 +5,7 @@ namespace Service.EducationApi.Services
 {
 	public interface ITokenService
 	{
-		ValueTask<TokenInfo> GenerateTokensAsync(LoginRequest request, string ipAddress);
+		ValueTask<TokenInfo> GenerateTokensAsync(string userName, string ipAddress, string password = null);
 
 		ValueTask<TokenInfo> RefreshTokensAsync(string currentRefreshToken, string ipAddress);
 	}

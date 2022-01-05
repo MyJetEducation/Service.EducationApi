@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
@@ -20,14 +23,19 @@ namespace Service.EducationApi.Controllers
 		private readonly ILoginRequestValidator _loginRequestValidator;
 		private readonly IPasswordRecoveryService _passwordRecoveryService;
 		private readonly IRegistrationService _registrationService;
+		private readonly ITokenService _tokenService;
 
 		public RegisterController(IUserInfoService userInfoService,
 			ILoginRequestValidator loginRequestValidator,
-			IPasswordRecoveryService passwordRecoveryService, IRegistrationService registrationService) : base(userInfoService)
+			IPasswordRecoveryService passwordRecoveryService,
+			IRegistrationService registrationService,
+			ITokenService tokenService,
+			ILogger<RegisterController> logger) : base(userInfoService, logger)
 		{
 			_loginRequestValidator = loginRequestValidator;
 			_passwordRecoveryService = passwordRecoveryService;
 			_registrationService = registrationService;
+			_tokenService = tokenService;
 		}
 
 		[HttpPost("create")]
@@ -55,11 +63,19 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("confirm")]
+		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async ValueTask<IActionResult> ConfirmRegisterAsync([FromBody, Required] string hash)
 		{
-			CommonGrpcResponse response = await _registrationService.ConfirmRegistrationAsync(new ConfirmRegistrationGrpcRequest {Hash = hash});
+			ConfirmRegistrationGrpcResponse response = await _registrationService.ConfirmRegistrationAsync(new ConfirmRegistrationGrpcRequest {Hash = hash});
 
-			return Result(response?.IsSuccess);
+			string userName = response?.Email;
+			if (userName.IsNullOrEmpty())
+				return StatusResponse.Error();
+
+			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(userName, GetIpAddress());
+			return tokenInfo != null
+				? DataResponse<TokenInfo>.Ok(tokenInfo)
+				: Unauthorized();
 		}
 
 		[HttpPost("recovery")]

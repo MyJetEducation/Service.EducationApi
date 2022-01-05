@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +21,7 @@ namespace Service.EducationApi.Controllers
 
 		public AuthController(ITokenService tokenService,
 			ILogger<AuthController> logger,
-			IUserInfoService userInfoService) : base(userInfoService)
+			IUserInfoService userInfoService) : base(userInfoService, logger)
 		{
 			_tokenService = tokenService;
 			_logger = logger;
@@ -33,11 +32,11 @@ namespace Service.EducationApi.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async ValueTask<IActionResult> LoginAsync([FromBody] LoginRequest request)
 		{
-			TokenInfo info = await _tokenService.GenerateTokensAsync(request, GetIpAddress());
+			TokenInfo tokenInfo = await _tokenService.GenerateTokensAsync(request.UserName, GetIpAddress(), request.Password);
 
-			return info == null
-				? Unauthorized()
-				: DataResponse<TokenInfo>.Ok(info);
+			return tokenInfo != null
+				? DataResponse<TokenInfo>.Ok(tokenInfo)
+				: Unauthorized();
 		}
 
 		[AllowAnonymous]
@@ -58,20 +57,6 @@ namespace Service.EducationApi.Controllers
 			return info == null
 				? Forbid()
 				: DataResponse<TokenInfo>.Ok(info);
-		}
-
-		private string GetIpAddress()
-		{
-			string requestHeader = Request.Headers.ContainsKey("X-Forwarded-For")
-				? (string) Request.Headers["X-Forwarded-For"]
-				: HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
-
-			if (requestHeader == null)
-				throw new Exception("Can't obtain user IP address. Skip request");
-
-			_logger.LogDebug("User IP is: {ip}", requestHeader);
-
-			return requestHeader;
 		}
 	}
 }

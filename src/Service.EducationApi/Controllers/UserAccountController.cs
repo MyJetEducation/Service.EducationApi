@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
@@ -18,8 +19,10 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IUserProfileService _userProfileService;
 
-		public UserAccountController(IUserInfoService userInfoService, IUserProfileService userProfileService) : base(userInfoService) =>
-			_userProfileService = userProfileService;
+		public UserAccountController(IUserInfoService userInfoService,
+			IUserProfileService userProfileService,
+			ILogger<UserAccountController> logger)
+			: base(userInfoService, logger) => _userProfileService = userProfileService;
 
 		[HttpPost("get")]
 		public async ValueTask<IActionResult> GetAccountAsync()
@@ -31,9 +34,9 @@ namespace Service.EducationApi.Controllers
 			AccountGrpcResponse account = await _userProfileService.GetAccount(new GetAccountGrpcRequest {UserId = userId});
 
 			AccountDataGrpcModel accountData = account?.Data;
-			
-			return accountData == null 
-				? StatusResponse.Error(ResponseCode.NoResponseData) 
+
+			return accountData == null
+				? StatusResponse.Error(ResponseCode.NoResponseData)
 				: DataResponse<UserAccount>.Ok(accountData.ToModel());
 		}
 

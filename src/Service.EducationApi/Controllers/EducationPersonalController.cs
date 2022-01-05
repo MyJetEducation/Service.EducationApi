@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
 using Service.EducationApi.Models;
@@ -21,7 +22,10 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly ITutorialPersonalService _tutorialService;
 
-		public EducationPersonalController(IUserInfoService userInfoService, ITutorialPersonalService tutorialService) : base(userInfoService) => _tutorialService = tutorialService;
+		public EducationPersonalController(IUserInfoService userInfoService,
+			ITutorialPersonalService tutorialService,
+			ILogger<EducationPersonalController> logger)
+			: base(userInfoService, logger) => _tutorialService = tutorialService;
 
 		[HttpPost("/dashboard")]
 		public async ValueTask<IActionResult> GetDashboardStateAsync() =>
