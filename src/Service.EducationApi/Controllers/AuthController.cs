@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,7 +14,6 @@ using Service.UserInfo.Crud.Grpc;
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
-	[EnableCors("CorsApi")]
 	[Route("/api/auth/v1")]
 	public class AuthController : BaseController
 	{

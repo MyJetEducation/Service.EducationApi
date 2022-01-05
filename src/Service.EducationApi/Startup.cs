@@ -23,7 +23,7 @@ namespace Service.EducationApi
 			services.ConfigurateHeaders();
 			services.AddControllers();
 
-			services.AddCors(options =>
+			services.AddCors(options => //TODO: temporary
 			{
 				options.AddPolicy("CorsApi",
 					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
@@ -56,7 +56,7 @@ namespace Service.EducationApi
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-				endpoints.MapGet("/", async context => await context.Response.WriteAsync("Api endpoint"));
+				endpoints.MapGet("/", async context => await context.Response.WriteAsync("MyJetEducation API endpoint"));
 			});
 		}
 

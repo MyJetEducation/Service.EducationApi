@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
@@ -16,7 +15,6 @@ using Service.UserInfo.Crud.Grpc;
 
 namespace Service.EducationApi.Controllers
 {
-	[EnableCors("CorsApi")]
 	[Route("/api/register/v1")]
 	public class RegisterController : BaseController
 	{

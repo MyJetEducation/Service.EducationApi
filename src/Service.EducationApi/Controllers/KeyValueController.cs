@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Service.Core.Domain.Extensions;
@@ -17,7 +16,6 @@ using Service.UserInfo.Crud.Grpc;
 namespace Service.EducationApi.Controllers
 {
 	[Authorize]
-	[EnableCors("CorsApi")]
 	[Route("/api/keyvalue/v1")]
 	[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 	public class KeyValueController : BaseController
