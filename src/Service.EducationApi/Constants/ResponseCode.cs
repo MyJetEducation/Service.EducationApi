@@ -17,5 +17,7 @@
 		public const int NotValidPassword = -6;
 
 		public const int NotValidEmail = -7;
+
+		public const int NotValidFullName = -8;
 	}
 }

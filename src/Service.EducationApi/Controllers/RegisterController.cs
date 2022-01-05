@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Service.Core.Domain.Extensions;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
@@ -32,9 +31,9 @@ namespace Service.EducationApi.Controllers
 		}
 
 		[HttpPost("create")]
-		public async ValueTask<IActionResult> RegisterAsync([FromBody] LoginRequest request)
+		public async ValueTask<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
 		{
-			int? validationResult = _loginRequestValidator.ValidateRequest(request);
+			int? validationResult = _loginRequestValidator.ValidateRegisterRequest(request);
 			if (validationResult != null)
 			{
 				WaitFakeRequest();
@@ -48,7 +47,8 @@ namespace Service.EducationApi.Controllers
 			CommonGrpcResponse response = await _registrationService.RegistrationAsync(new RegistrationGrpcRequest
 			{
 				UserName = request.UserName,
-				Password = request.Password
+				Password = request.Password,
+				FullName = request.FullName
 			});
 
 			return Result(response?.IsSuccess);
@@ -57,12 +57,6 @@ namespace Service.EducationApi.Controllers
 		[HttpPost("confirm")]
 		public async ValueTask<IActionResult> ConfirmRegisterAsync([FromBody, Required] string hash)
 		{
-			if (hash.IsNullOrWhiteSpace())
-			{
-				WaitFakeRequest();
-				return StatusResponse.Error(ResponseCode.NoRequestData);
-			}
-
 			CommonGrpcResponse response = await _registrationService.ConfirmRegistrationAsync(new ConfirmRegistrationGrpcRequest {Hash = hash});
 
 			return Result(response?.IsSuccess);
@@ -71,12 +65,6 @@ namespace Service.EducationApi.Controllers
 		[HttpPost("recovery")]
 		public async ValueTask<IActionResult> PasswordRecoveryAsync([FromBody, Required] string email)
 		{
-			if (email.IsNullOrWhiteSpace())
-			{
-				WaitFakeRequest();
-				return StatusResponse.Error(ResponseCode.NoRequestData);
-			}
-
 			CommonGrpcResponse response = await _passwordRecoveryService.Recovery(new RecoveryPasswordGrpcRequest {Email = email});
 
 			return Result(response?.IsSuccess);
@@ -86,13 +74,8 @@ namespace Service.EducationApi.Controllers
 		public async ValueTask<IActionResult> ChangePasswordAsync([FromBody, Required] ChangePasswordRequest request)
 		{
 			string hash = request.Hash;
-			if (hash.IsNullOrWhiteSpace())
-			{
-				WaitFakeRequest();
-				return StatusResponse.Error(ResponseCode.NoRequestData);
-			}
-
 			string password = request.Password;
+
 			int? validationResult = _loginRequestValidator.ValidatePassword(password);
 			if (validationResult != null)
 			{

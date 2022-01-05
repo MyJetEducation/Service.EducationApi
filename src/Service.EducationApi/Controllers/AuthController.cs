@@ -19,16 +19,13 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly ITokenService _tokenService;
 		private readonly ILogger<AuthController> _logger;
-		private readonly ILoginRequestValidator _loginRequestValidator;
 
-		public AuthController(ITokenService tokenService, 
-			ILogger<AuthController> logger, 
-			ILoginRequestValidator loginRequestValidator, 
+		public AuthController(ITokenService tokenService,
+			ILogger<AuthController> logger,
 			IUserInfoService userInfoService) : base(userInfoService)
 		{
 			_tokenService = tokenService;
 			_logger = logger;
-			_loginRequestValidator = loginRequestValidator;
 		}
 
 		[AllowAnonymous]
@@ -36,12 +33,6 @@ namespace Service.EducationApi.Controllers
 		[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 		public async ValueTask<IActionResult> LoginAsync([FromBody] LoginRequest request)
 		{
-			if (_loginRequestValidator.ValidateRequired(request))
-			{
-				WaitFakeRequest();
-				return StatusResponse.Error(ResponseCode.NoRequestData);
-			}
-
 			TokenInfo info = await _tokenService.GenerateTokensAsync(request, GetIpAddress());
 
 			return info == null
