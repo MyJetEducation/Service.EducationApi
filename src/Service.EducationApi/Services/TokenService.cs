@@ -83,9 +83,11 @@ namespace Service.EducationApi.Services
 			byte[] key = Encoding.ASCII.GetBytes(_jwtSecret);
 			string clientId = userInfo.UserName;
 
+			string jwtAudience = Program.ReloadedSettings(model => model.JwtAudience).Invoke();
+
 			var claims = new[]
 			{
-				new Claim(JwtRegisteredClaimNames.Aud, Program.Settings.JwtAudience),
+				new Claim(JwtRegisteredClaimNames.Aud, jwtAudience),
 				new Claim(ClaimsIdentity.DefaultNameClaimType, clientId),
 				new Claim(ClaimsIdentity.DefaultRoleClaimType, userInfo.Role)
 			};
