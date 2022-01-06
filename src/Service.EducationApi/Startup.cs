@@ -22,8 +22,14 @@ namespace Service.EducationApi
 			services.SetupSwaggerDocumentation();
 			services.ConfigurateHeaders();
 			services.AddControllers();
-			services.AddCors();
-			services.AddMvc();
+
+			services.AddCors(options =>
+			{
+				options.AddPolicy("CorsApi",
+					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
+						.AllowAnyHeader()
+						.AllowAnyMethod());
+			});
 
 			services
 				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
@@ -35,17 +41,10 @@ namespace Service.EducationApi
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
 
-			app.UseStaticFiles();
 			app.UseForwardedHeaders();
 			app.UseRouting();
-
-			//TODO: temporary
-			app.UseCors(options => options
-				.AllowAnyOrigin()
-				.AllowAnyHeader()
-				.AllowAnyMethod()
-				.AllowCredentials());
-
+			app.UseCors("CorsApi"); //TODO: temporary
+			app.UseStaticFiles();
 			app.UseMetricServer();
 			app.BindServicesTree(Assembly.GetExecutingAssembly());
 			app.BindIsAlive();
