@@ -25,10 +25,11 @@ namespace Service.EducationApi
 
 			services.AddCors(options =>
 			{
-				options.AddPolicy("CorsApi",
-					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
-						.AllowAnyHeader()
-						.AllowAnyMethod());
+				options.AddPolicy("CorsPolicy",
+					builder => builder.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyHeader()
+					.AllowCredentials());
 			});
 
 			services
@@ -58,6 +59,8 @@ namespace Service.EducationApi
 				endpoints.MapControllers();
 				endpoints.MapGet("/", async context => await context.Response.WriteAsync("MyJetEducation API endpoint"));
 			});
+
+			app.UseMvc();
 		}
 
 		public void ConfigureContainer(ContainerBuilder builder)
