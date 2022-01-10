@@ -10,7 +10,7 @@ namespace Service.EducationApi.Mappers
 			? new TestScoreResponse
 			{
 				IsSuccess = response.IsSuccess,
-				Unit = response.Unit.ToModel()
+				Unit = response.Unit?.ToModel()
 			}
 			: null;
 
@@ -24,7 +24,15 @@ namespace Service.EducationApi.Mappers
 			}
 			: null;
 
-		public static TotalProgressResponse ToModel(this TotalProgressStateGrpcModel grpcModel) => grpcModel != null
+		public static FinishUnitResponse ToModel(this FinishUnitGrpcResponse grpcResponse) => grpcResponse != null
+			? new FinishUnitResponse
+			{
+				Unit = grpcResponse.Unit?.ToModel(),
+				TotalProgress = grpcResponse.TotalProgress.ToModel()
+			}
+			: null;
+
+		private static TotalProgressResponse ToModel(this TotalProgressStateGrpcModel grpcModel) => grpcModel != null
 			? new TotalProgressResponse
 			{
 				HabitName = grpcModel.HabitName,
@@ -35,7 +43,7 @@ namespace Service.EducationApi.Mappers
 			}
 			: null;
 
-		public static PersonalStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
+		private static PersonalStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
 			? new PersonalStateUnit
 			{
 				Index = grpcModel.Index,
@@ -47,21 +55,13 @@ namespace Service.EducationApi.Mappers
 			}
 			: null;
 
-		public static PersonalStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
+		private static PersonalStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
 			? new PersonalStateTask
 			{
 				TaskId = grpcModel.TaskId,
 				TestScore = grpcModel.TestScore,
 				Duration = grpcModel.Duration,
 				CanRetry = grpcModel.CanRetry
-			}
-			: null;
-
-		public static FinishUnitResponse ToModel(this FinishUnitGrpcResponse grpcResponse) => grpcResponse != null
-			? new FinishUnitResponse
-			{
-				Unit = grpcResponse.Unit.ToModel(),
-				TotalProgress = grpcResponse.TotalProgress.ToModel()
 			}
 			: null;
 	}
