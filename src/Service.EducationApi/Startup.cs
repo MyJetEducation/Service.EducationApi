@@ -21,16 +21,16 @@ namespace Service.EducationApi
 			services.AddMyTelemetry("ED-", Program.Settings.ZipkinUrl);
 			services.SetupSwaggerDocumentation();
 			services.ConfigurateHeaders();
-			services.AddControllers();
 
 			services.AddCors(options =>
 			{
-				options.AddPolicy("CorsPolicy",
-					builder => builder.AllowAnyOrigin()
-					.AllowAnyMethod()
-					.AllowAnyHeader()
-					.AllowCredentials());
+				options.AddPolicy("CorsApi",
+					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
+						.AllowAnyHeader()
+						.AllowAnyMethod());
 			});
+
+			services.AddControllers();
 
 			services
 				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
