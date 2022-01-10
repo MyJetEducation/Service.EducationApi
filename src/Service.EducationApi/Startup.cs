@@ -59,8 +59,6 @@ namespace Service.EducationApi
 				endpoints.MapControllers();
 				endpoints.MapGet("/", async context => await context.Response.WriteAsync("MyJetEducation API endpoint"));
 			});
-
-			app.UseMvc();
 		}
 
 		public void ConfigureContainer(ContainerBuilder builder)
