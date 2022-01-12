@@ -21,15 +21,6 @@ namespace Service.EducationApi
 			services.AddMyTelemetry("ED-", Program.Settings.ZipkinUrl);
 			services.SetupSwaggerDocumentation();
 			services.ConfigurateHeaders();
-
-			services.AddCors(options =>
-			{
-				options.AddPolicy("CorsApi",
-					builder => builder.WithOrigins("http://localhost:3000", "http://localhost")
-						.AllowAnyHeader()
-						.AllowAnyMethod());
-			});
-
 			services.AddControllers();
 
 			services
@@ -44,7 +35,6 @@ namespace Service.EducationApi
 
 			app.UseForwardedHeaders();
 			app.UseRouting();
-			app.UseCors("CorsApi"); //TODO: temporary
 			app.UseStaticFiles();
 			app.UseMetricServer();
 			app.BindServicesTree(Assembly.GetExecutingAssembly());
