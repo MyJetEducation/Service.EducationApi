@@ -35,9 +35,9 @@ namespace Service.EducationApi.Mappers
 		private static TotalProgressResponse ToModel(this TotalProgressStateGrpcModel grpcModel) => grpcModel != null
 			? new TotalProgressResponse
 			{
-				HabitName = grpcModel.HabitName,
+				HabitValue = grpcModel.HabitValue,
 				HabitProgress = grpcModel.HabitProgress,
-				SkillName = grpcModel.SkillName,
+				SkillValue = grpcModel.SkillValue,
 				SkillProgress = grpcModel.SkillProgress,
 				Achievements = grpcModel.Achievements
 			}
@@ -46,11 +46,8 @@ namespace Service.EducationApi.Mappers
 		private static PersonalStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
 			? new PersonalStateUnit
 			{
-				Index = grpcModel.Index,
-				Duration = grpcModel.Duration,
+				Unit = grpcModel.Unit,
 				TestScore = grpcModel.TestScore,
-				HabitCount = grpcModel.HabitCount,
-				SkillCount = grpcModel.SkillCount,
 				Tasks = grpcModel.Tasks?.Select(task => task.ToModel())
 			}
 			: null;
@@ -58,9 +55,8 @@ namespace Service.EducationApi.Mappers
 		private static PersonalStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
 			? new PersonalStateTask
 			{
-				TaskId = grpcModel.TaskId,
+				Task = grpcModel.Task,
 				TestScore = grpcModel.TestScore,
-				Duration = grpcModel.Duration,
 				CanRetry = grpcModel.CanRetry
 			}
 			: null;

@@ -5,7 +5,7 @@ namespace Service.EducationApi.Models.TaskModels
 {
 	public class PersonalStateUnit
 	{
-		public int Index { get; set; }
+		public int Unit { get; set; }
 
 		public TimeSpan Duration { get; set; }
 

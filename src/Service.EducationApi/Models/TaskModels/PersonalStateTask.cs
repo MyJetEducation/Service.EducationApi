@@ -4,7 +4,7 @@ namespace Service.EducationApi.Models.TaskModels
 {
 	public class PersonalStateTask
 	{
-		public int TaskId { get; set; }
+		public int Task { get; set; }
 
 		public TimeSpan Duration { get; set; }
 

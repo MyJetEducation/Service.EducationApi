@@ -4,11 +4,11 @@
 	{
 		public int HabitProgress { get; set; }
 
-		public string HabitName { get; set; }
+		public int HabitValue { get; set; }
 
 		public int SkillProgress { get; set; }
 
-		public string SkillName { get; set; }
+		public int SkillValue { get; set; }
 
 		public string[] Achievements { get; set; }
 	}
