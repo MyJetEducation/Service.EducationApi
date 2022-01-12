@@ -18,7 +18,6 @@ namespace Service.EducationApi.Mappers
 			? new PersonalStateResponse
 			{
 				Available = response.Available,
-				Duration = response.Duration,
 				Units = response.Units?.Select(unit => unit.ToModel()),
 				TotalProgress = response.TotalProgress.ToModel()
 			}

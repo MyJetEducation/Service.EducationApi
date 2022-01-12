@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Service.EducationApi.Models.TaskModels
 {
 	public class PersonalStateUnit
 	{
 		public int Unit { get; set; }
-
-		public TimeSpan Duration { get; set; }
 
 		public int TestScore { get; set; }
 
