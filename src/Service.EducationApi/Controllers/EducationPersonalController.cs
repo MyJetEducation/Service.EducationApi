@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
+using Service.Core.Domain.Models.Education;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Mappers;
 using Service.EducationApi.Models;
@@ -36,8 +37,13 @@ namespace Service.EducationApi.Controllers
 
 		[HttpPost("/state")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<FinishUnitResponse>), Description = "Ok")]
-		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody, Required] int unit) =>
-			await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unit}), grpc => grpc.ToModel());
+		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody, Required] int unit)
+		{
+			if (EducationHelper.GetUnit(EducationTutorial.PersonalFinance, unit) == null)
+				return StatusResponse.Error(ResponseCode.NotValidRequestData);
+
+			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unit}), grpc => grpc.ToModel());
+		}
 
 		#region Unit1 (Your income)
 

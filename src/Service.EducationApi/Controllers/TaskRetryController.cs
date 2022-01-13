@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
+using Service.Core.Domain.Models.Education;
 using Service.Core.Grpc.Models;
 using Service.EducationApi.Constants;
 using Service.EducationApi.Models;
@@ -43,38 +44,36 @@ namespace Service.EducationApi.Controllers
 
 		[HttpPost("use/date")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<int>), Description = "Ok")]
-		public async ValueTask<IActionResult> UseRetryByDateAsync([FromBody] UseRetryRequest request)
-		{
-			Guid? userId = await GetUserIdAsync();
-			if (userId == null)
-				return StatusResponse.Error(ResponseCode.UserNotFound);
-
-			CommonGrpcResponse response = await _educationRetryService.DecreaseRetryDateAsync(new DecreaseRetryDateGrpcRequest
+		public async ValueTask<IActionResult> UseRetryByDateAsync([FromBody] UseRetryRequest request) =>
+			await Process(request, userId => _educationRetryService.DecreaseRetryDateAsync(new DecreaseRetryDateGrpcRequest
 			{
 				UserId = userId,
 				Tutorial = request.Tutorial,
 				Unit = request.Unit,
 				Task = request.Task
-			});
-
-			return Result(response?.IsSuccess);
-		}
+			}));
 
 		[HttpPost("use/count")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<int>), Description = "Ok")]
-		public async ValueTask<IActionResult> UseRetryByCountAsync([FromBody] UseRetryRequest request)
-		{
-			Guid? userId = await GetUserIdAsync();
-			if (userId == null)
-				return StatusResponse.Error(ResponseCode.UserNotFound);
-
-			CommonGrpcResponse response = await _educationRetryService.DecreaseRetryCountAsync(new DecreaseRetryCountGrpcRequest
+		public async ValueTask<IActionResult> UseRetryByCountAsync([FromBody] UseRetryRequest request) =>
+			await Process(request, userId => _educationRetryService.DecreaseRetryCountAsync(new DecreaseRetryCountGrpcRequest
 			{
 				UserId = userId,
 				Tutorial = request.Tutorial,
 				Unit = request.Unit,
 				Task = request.Task
-			});
+			}));
+
+		private async ValueTask<IActionResult> Process(UseRetryRequest request, Func<Guid?, ValueTask<CommonGrpcResponse>> grpcRequestFunc)
+		{
+			if (EducationHelper.GetTask(request.Tutorial, request.Unit, request.Task) == null)
+				return StatusResponse.Error(ResponseCode.NotValidRequestData);
+
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			CommonGrpcResponse response = await grpcRequestFunc.Invoke(userId);
 
 			return Result(response?.IsSuccess);
 		}

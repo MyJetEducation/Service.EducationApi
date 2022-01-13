@@ -19,5 +19,7 @@
 		public const int NotValidEmail = -7;
 
 		public const int NotValidFullName = -8;
+
+		public const int NotValidRequestData = -9;
 	}
 }
