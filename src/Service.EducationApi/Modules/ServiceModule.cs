@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
 using Service.EducationApi.Services;
+using Service.EducationRetry.Client;
 using Service.KeyValue.Client;
 using Service.PasswordRecovery.Client;
 using Service.Registration.Client;
@@ -21,6 +22,7 @@ namespace Service.EducationApi.Modules
 			builder.RegisterPasswordRecoveryClient(Program.Settings.PasswordRecoveryServiceUrl);
 			builder.RegisterRegistrationClient(Program.Settings.RegistrationServiceUrl);
 			builder.RegisterTutorialPersonalClient(Program.Settings.TutorialPersonalServiceUrl);
+			builder.RegisterEducationRetryClient(Program.Settings.EducationRetryServiceUrl);
 
 			builder.RegisterType<LoginRequestValidator>().AsImplementedInterfaces();
 

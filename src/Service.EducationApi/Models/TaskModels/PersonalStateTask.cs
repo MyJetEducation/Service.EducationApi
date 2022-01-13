@@ -6,6 +6,6 @@
 
 		public int TestScore { get; set; }
 
-		public bool CanRetry { get; set; }
+		public RetryInfo Retry { get; set; }
 	}
 }

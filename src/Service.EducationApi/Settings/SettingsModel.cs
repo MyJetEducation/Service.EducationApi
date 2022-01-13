@@ -38,6 +38,9 @@ namespace Service.EducationApi.Settings
 		[YamlProperty("EducationApi.TutorialPersonalServiceUrl")]
 		public string TutorialPersonalServiceUrl { get; set; }
 
+		[YamlProperty("EducationApi.EducationRetryServiceUrl")]
+		public string EducationRetryServiceUrl { get; set; }
+
 		[YamlProperty("EducationApi.JwtAudience")]
 		public string JwtAudience { get; set; }
 	}

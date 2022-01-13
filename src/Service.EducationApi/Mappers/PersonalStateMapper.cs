@@ -56,7 +56,16 @@ namespace Service.EducationApi.Mappers
 			{
 				Task = grpcModel.Task,
 				TestScore = grpcModel.TestScore,
-				CanRetry = grpcModel.CanRetry
+				Retry = grpcModel.RetryInfo.ToModel()
+			}
+			: null;
+
+		private static RetryInfo ToModel(this TaskRetryInfoGrpcModel grpcModel) => grpcModel != null
+			? new RetryInfo
+			{
+				InRetry = grpcModel.InRetry,
+				CanRetryByCount = grpcModel.CanRetryByCount,
+				CanRetryByTime = grpcModel.CanRetryByTime
 			}
 			: null;
 	}
