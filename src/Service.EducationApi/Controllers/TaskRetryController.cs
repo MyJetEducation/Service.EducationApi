@@ -22,7 +22,7 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly IEducationRetryService _educationRetryService;
 
-		public TaskRetryController(IUserInfoService userInfoService, ILogger logger, IEducationRetryService educationRetryService)
+		public TaskRetryController(IUserInfoService userInfoService, ILogger<TaskRetryController> logger, IEducationRetryService educationRetryService)
 			: base(userInfoService, logger) => _educationRetryService = educationRetryService;
 
 		[HttpPost("count")]
