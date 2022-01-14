@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Service.EducationApi.Models.TaskModels;
+using Service.EducationApi.Models;
 using Service.TutorialPersonal.Grpc.Models;
 
 namespace Service.EducationApi.Mappers

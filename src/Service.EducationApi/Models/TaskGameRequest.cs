@@ -1,4 +1,4 @@
-﻿namespace Service.EducationApi.Models.TaskModels
+﻿namespace Service.EducationApi.Models
 {
 	public class TaskGameRequest: TaskRequestBase
 	{

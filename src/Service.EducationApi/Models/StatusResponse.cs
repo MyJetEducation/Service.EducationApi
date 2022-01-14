@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Service.EducationApi.Constants;
+using Service.Core.Domain.Models.Constants;
 
 namespace Service.EducationApi.Models
 {

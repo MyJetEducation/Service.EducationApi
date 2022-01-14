@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Service.EducationApi.Models.TaskModels
+namespace Service.EducationApi.Models
 {
 	public class PersonalStateUnit
 	{

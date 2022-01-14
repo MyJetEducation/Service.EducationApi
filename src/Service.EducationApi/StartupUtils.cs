@@ -18,7 +18,8 @@ namespace Service.EducationApi
 		/// </summary>
 		public static void SetupSwaggerDocumentation(this IServiceCollection services) => services.AddSwaggerDocument(o =>
 		{
-			o.Title = "MyJetEducation API";
+			o.Title = "MyJetEducation EducationApi";
+			o.DocumentName = "education";
 			o.GenerateEnumMappingDescription = true;
 
 			o.AddSecurity("Bearer", Enumerable.Empty<string>(),

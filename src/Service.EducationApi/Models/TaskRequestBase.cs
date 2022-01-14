@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Service.EducationApi.Models.TaskModels
+namespace Service.EducationApi.Models
 {
 	public class TaskRequestBase
 	{

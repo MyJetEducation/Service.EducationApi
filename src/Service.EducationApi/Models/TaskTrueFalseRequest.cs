@@ -2,9 +2,9 @@
 
 namespace Service.EducationApi.Models
 {
-	public class RegisterRequest: LoginRequest
+	public class TaskTrueFalseRequest: TaskRequestBase
 	{
 		[Required]
-		public string FullName { get; set; }
+		public TaskTrueFalse[] Answers { get; set; }
 	}
 }

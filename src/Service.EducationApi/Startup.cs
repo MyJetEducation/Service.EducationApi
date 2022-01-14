@@ -44,6 +44,13 @@ namespace Service.EducationApi
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+			app.UseOpenApi(settings => settings.Path = "/api/v1/{documentName}/swagger/swagger.json");
+			app.UseSwaggerUi3(settings =>
+			{
+				settings.Path = "/api/v1/{documentName}/swagger";
+				settings.DocumentPath = "/api/v1/{documentName}/swagger/swagger.json";
+			});
+
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
