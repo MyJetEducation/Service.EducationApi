@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Service.TutorialPersonal.Client;
 using Service.UserInfo.Crud.Client;
+using Service.UserReward.Client;
 
 namespace Service.EducationApi.Modules
 {
@@ -10,6 +11,7 @@ namespace Service.EducationApi.Modules
 		{
 			builder.RegisterUserInfoCrudClient(Program.Settings.UserInfoCrudServiceUrl);
 			builder.RegisterTutorialPersonalClient(Program.Settings.TutorialPersonalServiceUrl);
+			builder.RegisterUserRewardClient(Program.Settings.UserRewardServiceUrl);
 		}
 	}
 }

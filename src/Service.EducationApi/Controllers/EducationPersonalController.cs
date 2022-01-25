@@ -8,12 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Service.Core.Domain.Models.Constants;
 using Service.Core.Domain.Models.Education;
+using Service.Core.Grpc.Models;
 using Service.EducationApi.Mappers;
 using Service.EducationApi.Models;
 using Service.TutorialPersonal.Grpc;
 using Service.TutorialPersonal.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
 using Service.UserInfo.Crud.Grpc.Models;
+using Service.UserReward.Grpc;
+using Service.UserReward.Grpc.Models;
 
 namespace Service.EducationApi.Controllers
 {
@@ -28,11 +31,32 @@ namespace Service.EducationApi.Controllers
 	{
 		private readonly ITutorialPersonalService _tutorialService;
 		private readonly IUserInfoService _userInfoService;
+		private readonly IUserRewardService _userRewardService;
 
-		public EducationPersonalController(ITutorialPersonalService tutorialService, IUserInfoService userInfoService)
+		public EducationPersonalController(ITutorialPersonalService tutorialService, IUserInfoService userInfoService, IUserRewardService userRewardService)
 		{
 			_tutorialService = tutorialService;
 			_userInfoService = userInfoService;
+			_userRewardService = userRewardService;
+		}
+
+		[HttpPost("started")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<PersonalStateResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> LearningStartedAsync()
+		{
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			CommonGrpcResponse response = await _userRewardService.LearningStartedAsync(new LearningStartedGrpcRequset
+			{
+				UserId = userId,
+				Tutorial = EducationTutorial.PersonalFinance,
+				Unit = 1,
+				Task = 1
+			});
+
+			return StatusResponse.Result(response.IsSuccess);
 		}
 
 		[HttpPost("dashboard")]

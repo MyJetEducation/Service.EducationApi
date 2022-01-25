@@ -22,5 +22,8 @@ namespace Service.EducationApi.Settings
 
 		[YamlProperty("EducationApi.JwtAudience")]
 		public string JwtAudience { get; set; }
+
+		[YamlProperty("EducationApi.UserRewardServiceUrl")]
+		public string UserRewardServiceUrl { get; set; }
 	}
 }
