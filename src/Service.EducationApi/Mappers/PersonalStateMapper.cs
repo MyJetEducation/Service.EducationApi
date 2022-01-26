@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Service.EducationApi.Models;
 using Service.TutorialPersonal.Grpc.Models.State;
+using Enum = System.Enum;
 
 namespace Service.EducationApi.Mappers
 {
@@ -38,7 +39,7 @@ namespace Service.EducationApi.Mappers
 				HabitProgress = grpcModel.HabitProgress,
 				SkillValue = grpcModel.SkillValue,
 				SkillProgress = grpcModel.SkillProgress,
-				Achievements = grpcModel.Achievements
+				Achievements = grpcModel.Achievements.Select(Enum.GetName).ToArray()
 			}
 			: null;
 
