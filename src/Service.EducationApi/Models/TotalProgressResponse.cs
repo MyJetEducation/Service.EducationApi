@@ -2,13 +2,9 @@
 {
 	public class TotalProgressResponse
 	{
-		public int HabitProgress { get; set; }
+		public TotalProgressItemResponse Habit { get; set; }
 
-		public int HabitValue { get; set; }
-
-		public int SkillProgress { get; set; }
-
-		public int SkillValue { get; set; }
+		public TotalProgressItemResponse Skill { get; set; }
 
 		public string[] Achievements { get; set; }
 	}

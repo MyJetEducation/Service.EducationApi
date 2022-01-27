@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.1" />
-    <PackageReference Include="MyJetEducation.Service.TutorialPersonal.Client" Version="1.0.6" />
+    <PackageReference Include="MyJetEducation.Service.TutorialPersonal.Client" Version="1.0.7" />
     <PackageReference Include="MyJetEducation.Service.UserInfo.Crud.Client" Version="1.0.12" />
     <PackageReference Include="MyJetEducation.Service.UserReward.Client" Version="1.0.2" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.15.5" />

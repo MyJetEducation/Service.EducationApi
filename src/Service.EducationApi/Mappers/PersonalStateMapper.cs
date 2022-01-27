@@ -35,11 +35,18 @@ namespace Service.EducationApi.Mappers
 		private static TotalProgressResponse ToModel(this TotalProgressStateGrpcModel grpcModel) => grpcModel != null
 			? new TotalProgressResponse
 			{
-				HabitValue = grpcModel.HabitValue,
-				HabitProgress = grpcModel.HabitProgress,
-				SkillValue = grpcModel.SkillValue,
-				SkillProgress = grpcModel.SkillProgress,
+				Habit = grpcModel.Habit.ToModel(),
+				Skill = grpcModel.Skill.ToModel(),
 				Achievements = grpcModel.Achievements?.Select(Enum.GetName).ToArray()
+			}
+			: null;
+
+		private static TotalProgressItemResponse ToModel(this ProgressItemInfoGrpcModel grpcModel) => grpcModel != null
+			? new TotalProgressItemResponse
+			{
+				Index = grpcModel.Index,
+				Count = grpcModel.Count,
+				Progress = grpcModel.Progress
 			}
 			: null;
 
