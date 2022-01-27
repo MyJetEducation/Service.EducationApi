@@ -39,7 +39,7 @@ namespace Service.EducationApi.Mappers
 				HabitProgress = grpcModel.HabitProgress,
 				SkillValue = grpcModel.SkillValue,
 				SkillProgress = grpcModel.SkillProgress,
-				Achievements = grpcModel.Achievements.Select(Enum.GetName).ToArray()
+				Achievements = grpcModel.Achievements?.Select(Enum.GetName).ToArray()
 			}
 			: null;
 
