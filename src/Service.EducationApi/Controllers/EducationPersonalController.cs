@@ -48,7 +48,7 @@ namespace Service.EducationApi.Controllers
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
-			CommonGrpcResponse response = await _userRewardService.LearningStartedAsync(new LearningStartedGrpcRequset
+			CommonGrpcResponse response = await _userRewardService.LearningStartedAsync(new LearningStartedGrpcRequest
 			{
 				UserId = userId,
 				Tutorial = EducationTutorial.PersonalFinance,
