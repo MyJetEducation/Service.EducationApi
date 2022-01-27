@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Service.EducationApi.Models
@@ -9,6 +9,7 @@ namespace Service.EducationApi.Models
 		public bool IsRetry { get; set; }
 
 		[Required]
-		public TimeSpan Duration { get; set; }
+		[Description("Milliseconds")]
+		public int Duration { get; set; }
 	}
 }

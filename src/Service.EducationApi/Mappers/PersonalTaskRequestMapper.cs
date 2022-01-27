@@ -11,14 +11,14 @@ namespace Service.EducationApi.Mappers
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = model.Duration
+			Duration = TimeSpan.FromMilliseconds(model.Duration)
 		};
 
 		public static PersonalTaskTestGrpcRequest ToGrpcModel(this TaskTestRequest model, Guid? userId) => new PersonalTaskTestGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = model.Duration,
+			Duration = TimeSpan.FromMilliseconds(model.Duration),
 			Answers = model.Answers.Select(answer => new PersonalTaskTestAnswerGrpcModel
 			{
 				Number = answer.Number,
@@ -30,7 +30,7 @@ namespace Service.EducationApi.Mappers
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = model.Duration,
+			Duration = TimeSpan.FromMilliseconds(model.Duration),
 			Value = model.Value
 		};
 
@@ -38,7 +38,7 @@ namespace Service.EducationApi.Mappers
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = model.Duration,
+			Duration = TimeSpan.FromMilliseconds(model.Duration),
 			Answers = model.Answers.Select(answer => new PersonalTaskTrueFalseAnswerGrpcModel
 			{
 				Number = answer.Number,
@@ -50,7 +50,7 @@ namespace Service.EducationApi.Mappers
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = model.Duration
+			Duration = TimeSpan.FromMilliseconds(model.Duration)
 		};
 	}
 }
