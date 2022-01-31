@@ -1,10 +1,10 @@
-# Service.EducationApi
+# Service.EducationPersonalApi
 
-![Release Service](https://github.com/MyJetEducation/Service.EducationApi/workflows/Release%20Service/badge.svg)
+![Release Service](https://github.com/MyJetEducation/Service.EducationPersonalApi/workflows/Release%20Service/badge.svg)
 
-![Release API client nuget](https://github.com/MyJetEducation/Service.EducationApi/workflows/Release%20API%20client%20nuget/badge.svg)
+![Release API client nuget](https://github.com/MyJetEducation/Service.EducationPersonalApi/workflows/Release%20API%20client%20nuget/badge.svg)
 
-![CI test build](https://github.com/MyJetEducation/Service.EducationApi/workflows/CI%20test%20build/badge.svg)
+![CI test build](https://github.com/MyJetEducation/Service.EducationPersonalApi/workflows/CI%20test%20build/badge.svg)
 
-*Client library:* ![Nuget version](https://img.shields.io/nuget/v/MyJetEducation.Service.EducationApi.Client?label=MyJetWallet.Service.EducationApi.Client&style=social)
+*Client library:* ![Nuget version](https://img.shields.io/nuget/v/MyJetEducation.Service.EducationPersonalApi.Client?label=MyJetWallet.Service.EducationPersonalApi.Client&style=social)
 

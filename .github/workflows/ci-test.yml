@@ -32,7 +32,7 @@ jobs:
       run: ls
 
     - name: Publish Service
-      run: dotnet publish --no-build ./src/Service.EducationApi/Service.EducationApi.csproj --configuration Release --output ./publish-api
+      run: dotnet publish --no-build ./src/Service.EducationPersonalApi/Service.EducationPersonalApi.csproj --configuration Release --output ./publish-api
 
     - name: Check Service dir
       run: ls ./publish-api
@@ -43,11 +43,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
         path: ./publish-api
-#        registry: docker.pkg.github.com
         registry: ghcr.io
-        repository: ${{ secrets.ORG_NAME }}/service.educationapi/service.educationapi-test
+        repository: ${{ secrets.ORG_NAME }}/service.educationpersonalapi/service.educationpersonalapi-test
         tags: latest
-        build_args: app_version=service.educationapi-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
+        build_args: app_version=service.educationpersonalapi-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
 
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
@@ -56,29 +55,4 @@ jobs:
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         key: ${{ secrets.PRIVATE_KEY }}
-        script: cd /home/monfex/Services/Service.EducationApi && docker-compose pull && docker-compose up -d
-
-#    - name: Publish image Azure
-#      uses: docker/build-push-action@v1
-#      with:
-#        username: ${{ secrets.AZ_DOCKER_USER }}
-#        password: ${{ secrets.AZ_DOCKER_PASSWORD }}
-#        path: ./publish-api
-#        registry: ${{ secrets.AZ_REGISTRY }}
-#        repository: education/service.educationapi-test
-#        tags: latest
-#        add_git_labels: true
-#        build_args: app_version=service.educationapi-test:latest,app_compilation_date=${{ steps.current-time.outputs.formattedTime }}
-
-  #restart:
-  #  runs-on: self-hosted   
-  #  needs: build
-  #  steps:
-  #  - name: Restart service
-  #    uses: Myjetwallet/kube-restart-pods@master
-  #    env:
-  #      KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA__ST_TEST }}
-  #      NAMESPACE: ${{ secrets.KUBE_TEST_NAMESPACE }}
-  #      POD: educationapi
-
-
+        script: cd /home/monfex/Services/Service.EducationPersonalApi && docker-compose pull && docker-compose up -d

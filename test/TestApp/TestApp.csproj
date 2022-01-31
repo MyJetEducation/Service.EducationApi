@@ -9,8 +9,4 @@
     <PackageReference Include="protobuf-net.Grpc" Version="1.0.152" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Service.EducationApi.Client\Service.EducationApi.Client.csproj" />
-  </ItemGroup>
-
 </Project>
