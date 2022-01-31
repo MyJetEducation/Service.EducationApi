@@ -74,6 +74,29 @@ namespace Service.EducationApi.Controllers
 			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unit}), grpc => grpc.ToModel());
 		}
 
+		private async ValueTask<IActionResult> Process<TGrpcResponse, TModelResponse>(
+			Func<Guid?, ValueTask<TGrpcResponse>> grpcRequestFunc,
+			Func<TGrpcResponse, TModelResponse> responseFunc)
+		{
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			TGrpcResponse response = await grpcRequestFunc.Invoke(userId);
+
+			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
+		}
+
+		private async ValueTask<Guid?> GetUserIdAsync()
+		{
+			UserInfoResponse userInfoResponse = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest
+			{
+				UserName = User.Identity?.Name
+			});
+
+			return userInfoResponse?.UserInfo?.UserId;
+		}
+
 		#region Unit1 (Your income)
 
 		[HttpPost("unit1/text")]
@@ -103,103 +126,120 @@ namespace Service.EducationApi.Controllers
 
 		#endregion
 
-		#region Unit2 (Spending money secrets)
+		#region Unit2 (Spending money secrets. Instruction. Exercise)
 
-		//[HttpPost("/unit2/text")]
-		//public async ValueTask<IActionResult> Unit2TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit2Text(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit2/text")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit2TextAsync([FromBody] TaskTextRequest request) =>
+			await Process(userId => _tutorialService.Unit2TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit2/test")]
-		//public async ValueTask<IActionResult> Unit2TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit2Test(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit2/test")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit2TestAsync([FromBody] TaskTestRequest request) =>
+			await Process(userId => _tutorialService.Unit2TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit2/case")]
-		//public async ValueTask<IActionResult> Unit2CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit2Case(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit2/case")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit2CaseAsync([FromBody] TaskCaseRequest request) =>
+			await Process(userId => _tutorialService.Unit2CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit2/truefalse")]
-		//public async ValueTask<IActionResult> Unit2TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit2TrueFalse(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit2/truefalse")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit2TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
+			await Process(userId => _tutorialService.Unit2TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit2/game")]
-		//public async ValueTask<IActionResult> Unit2GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit2Game(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		#endregion
-
-		#region Unit3 (Hidden expenses and lost profits)
-
-		//[HttpPost("/unit3/text")]
-		//public async ValueTask<IActionResult> Unit3TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit3Text(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit3/test")]
-		//public async ValueTask<IActionResult> Unit3TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit3Test(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit3/case")]
-		//public async ValueTask<IActionResult> Unit3CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit3Case(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit3/truefalse")]
-		//public async ValueTask<IActionResult> Unit3TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit3TrueFalse(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit3/game")]
-		//public async ValueTask<IActionResult> Unit3GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit3Game(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit2/game")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit2GameAsync([FromBody] TaskGameRequest request) =>
+			await Process(userId => _tutorialService.Unit2GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		#endregion
 
-		#region Unit4 (Salary)
+		#region Unit3 (Hidden expenses and lost profits. Instruction. Exercise)
 
-		//[HttpPost("/unit4/text")]
-		//public async ValueTask<IActionResult> Unit4TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit4Text(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit3/text")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit3TextAsync([FromBody] TaskTextRequest request) =>
+			await Process(userId => _tutorialService.Unit3TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit4/test")]
-		//public async ValueTask<IActionResult> Unit4TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit4Test(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit3/test")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit3TestAsync([FromBody] TaskTestRequest request) =>
+			await Process(userId => _tutorialService.Unit3TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit4/case")]
-		//public async ValueTask<IActionResult> Unit4CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit4Case(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit3/case")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit3CaseAsync([FromBody] TaskCaseRequest request) =>
+			await Process(userId => _tutorialService.Unit3CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit4/truefalse")]
-		//public async ValueTask<IActionResult> Unit4TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit4TrueFalse(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit3/truefalse")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit3TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
+			await Process(userId => _tutorialService.Unit3TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		//[HttpPost("/unit4/game")]
-		//public async ValueTask<IActionResult> Unit4GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit4Game(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		#endregion
-
-		#region Unit5 (Budget planning in three steps)
-
-		//[HttpPost("/unit5/text")]
-		//public async ValueTask<IActionResult> Unit5TextAsync([FromBody] TaskTextRequest request) => await Process(userId => _tutorialService.Unit5Text(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit5/test")]
-		//public async ValueTask<IActionResult> Unit5TestAsync([FromBody] TaskTestRequest request) => await Process(userId => _tutorialService.Unit5Test(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit5/case")]
-		//public async ValueTask<IActionResult> Unit5CaseAsync([FromBody] TaskCaseRequest request) => await Process(userId => _tutorialService.Unit5Case(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit5/truefalse")]
-		//public async ValueTask<IActionResult> Unit5TrueFalseAsync([FromBody] TaskTrueFalseRequest request) => await Process(userId => _tutorialService.Unit5TrueFalse(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
-
-		//[HttpPost("/unit5/game")]
-		//public async ValueTask<IActionResult> Unit5GameAsync([FromBody] TaskGameRequest request) => await Process(userId => _tutorialService.Unit5Game(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+		[HttpPost("unit3/game")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit3GameAsync([FromBody] TaskGameRequest request) =>
+			await Process(userId => _tutorialService.Unit3GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
 		#endregion
 
-		private async ValueTask<IActionResult> Process<TGrpcResponse, TModelResponse>(
-			Func<Guid?, ValueTask<TGrpcResponse>> grpcRequestFunc,
-			Func<TGrpcResponse, TModelResponse> responseFunc)
-		{
-			Guid? userId = await GetUserIdAsync();
-			if (userId == null)
-				return StatusResponse.Error(ResponseCode.UserNotFound);
+		#region Unit4 (Salary - make sure that it is enough. Instruction. Exercise)
 
-			TGrpcResponse response = await grpcRequestFunc.Invoke(userId);
+		[HttpPost("unit4/text")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit4TextAsync([FromBody] TaskTextRequest request) =>
+			await Process(userId => _tutorialService.Unit4TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
-		}
+		[HttpPost("unit4/test")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit4TestAsync([FromBody] TaskTestRequest request) =>
+			await Process(userId => _tutorialService.Unit4TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-		private async ValueTask<Guid?> GetUserIdAsync()
-		{
-			UserInfoResponse userInfoResponse = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest
-			{
-				UserName = User.Identity?.Name
-			});
+		[HttpPost("unit4/case")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit4CaseAsync([FromBody] TaskCaseRequest request) =>
+			await Process(userId => _tutorialService.Unit4CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
 
-			return userInfoResponse?.UserInfo?.UserId;
-		}
+		[HttpPost("unit4/truefalse")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit4TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
+			await Process(userId => _tutorialService.Unit4TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		[HttpPost("unit4/game")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit4GameAsync([FromBody] TaskGameRequest request) =>
+			await Process(userId => _tutorialService.Unit4GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		#endregion
+
+		#region Unit5 (Budget planning in three steps. Modern tools. Instruction. Exercise)
+
+		[HttpPost("unit5/text")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit5TextAsync([FromBody] TaskTextRequest request) =>
+			await Process(userId => _tutorialService.Unit5TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		[HttpPost("unit5/test")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit5TestAsync([FromBody] TaskTestRequest request) =>
+			await Process(userId => _tutorialService.Unit5TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		[HttpPost("unit5/case")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit5CaseAsync([FromBody] TaskCaseRequest request) =>
+			await Process(userId => _tutorialService.Unit5CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		[HttpPost("unit5/truefalse")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit5TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
+			await Process(userId => _tutorialService.Unit5TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		[HttpPost("unit5/game")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
+		public async ValueTask<IActionResult> Unit5GameAsync([FromBody] TaskGameRequest request) =>
+			await Process(userId => _tutorialService.Unit5GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+
+		#endregion
 	}
 }
