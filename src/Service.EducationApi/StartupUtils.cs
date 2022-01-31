@@ -14,8 +14,8 @@ namespace Service.EducationApi
 {
 	public static class StartupUtils
 	{
-		private const string DocumentName = "education";
-		private const string ApiName = "EducationApi";
+		private const string DocumentName = "education/personal";
+		private const string ApiName = "EducationPersonalApi";
 
 		public static void SetupSwagger(this IApplicationBuilder app)
 		{
