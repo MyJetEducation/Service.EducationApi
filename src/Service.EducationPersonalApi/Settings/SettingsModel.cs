@@ -5,25 +5,25 @@ namespace Service.EducationPersonalApi.Settings
 {
 	public class SettingsModel
 	{
-		[YamlProperty("EducationApi.SeqServiceUrl")]
+		[YamlProperty("EducationPersonalApi.SeqServiceUrl")]
 		public string SeqServiceUrl { get; set; }
 
-		[YamlProperty("EducationApi.ZipkinUrl")]
+		[YamlProperty("EducationPersonalApi.ZipkinUrl")]
 		public string ZipkinUrl { get; set; }
 
-		[YamlProperty("EducationApi.ElkLogs")]
+		[YamlProperty("EducationPersonalApi.ElkLogs")]
 		public LogElkSettings ElkLogs { get; set; }
 
-		[YamlProperty("EducationApi.UserInfoCrudServiceUrl")]
+		[YamlProperty("EducationPersonalApi.UserInfoCrudServiceUrl")]
 		public string UserInfoCrudServiceUrl { get; set; }
 
-		[YamlProperty("EducationApi.TutorialPersonalServiceUrl")]
+		[YamlProperty("EducationPersonalApi.TutorialPersonalServiceUrl")]
 		public string TutorialPersonalServiceUrl { get; set; }
 
-		[YamlProperty("EducationApi.JwtAudience")]
+		[YamlProperty("EducationPersonalApi.JwtAudience")]
 		public string JwtAudience { get; set; }
 
-		[YamlProperty("EducationApi.UserRewardServiceUrl")]
+		[YamlProperty("EducationPersonalApi.UserRewardServiceUrl")]
 		public string UserRewardServiceUrl { get; set; }
 	}
 }
