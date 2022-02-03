@@ -7,18 +7,18 @@ namespace Service.EducationPersonalApi.Mappers
 {
 	public static class PersonalTaskRequestMapper
 	{
-		public static PersonalTaskTextGrpcRequest ToGrpcModel(this TaskTextRequest model, Guid? userId) => new PersonalTaskTextGrpcRequest
+		public static PersonalTaskTextGrpcRequest ToGrpcModel(this TaskTextRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskTextGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = TimeSpan.FromMilliseconds(model.Duration)
+			Duration = duration
 		};
 
-		public static PersonalTaskTestGrpcRequest ToGrpcModel(this TaskTestRequest model, Guid? userId) => new PersonalTaskTestGrpcRequest
+		public static PersonalTaskTestGrpcRequest ToGrpcModel(this TaskTestRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskTestGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = TimeSpan.FromMilliseconds(model.Duration),
+			Duration = duration,
 			Answers = model.Answers.Select(answer => new PersonalTaskTestAnswerGrpcModel
 			{
 				Number = answer.Number,
@@ -26,19 +26,19 @@ namespace Service.EducationPersonalApi.Mappers
 			}).ToArray()
 		};
 
-		public static PersonalTaskCaseGrpcRequest ToGrpcModel(this TaskCaseRequest model, Guid? userId) => new PersonalTaskCaseGrpcRequest
+		public static PersonalTaskCaseGrpcRequest ToGrpcModel(this TaskCaseRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskCaseGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = TimeSpan.FromMilliseconds(model.Duration),
+			Duration = duration,
 			Value = model.Value
 		};
 
-		public static PersonalTaskTrueFalseGrpcRequest ToGrpcModel(this TaskTrueFalseRequest model, Guid? userId) => new PersonalTaskTrueFalseGrpcRequest
+		public static PersonalTaskTrueFalseGrpcRequest ToGrpcModel(this TaskTrueFalseRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskTrueFalseGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = TimeSpan.FromMilliseconds(model.Duration),
+			Duration = duration,
 			Answers = model.Answers.Select(answer => new PersonalTaskTrueFalseAnswerGrpcModel
 			{
 				Number = answer.Number,
@@ -46,11 +46,11 @@ namespace Service.EducationPersonalApi.Mappers
 			}).ToArray()
 		};
 
-		public static PersonalTaskGameGrpcRequest ToGrpcModel(this TaskGameRequest model, Guid? userId) => new PersonalTaskGameGrpcRequest
+		public static PersonalTaskGameGrpcRequest ToGrpcModel(this TaskGameRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskGameGrpcRequest
 		{
 			UserId = userId,
 			IsRetry = model.IsRetry,
-			Duration = TimeSpan.FromMilliseconds(model.Duration)
+			Duration = duration
 		};
 	}
 }

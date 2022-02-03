@@ -9,8 +9,11 @@ using NSwag.Annotations;
 using Service.Core.Client.Constants;
 using Service.Core.Client.Education;
 using Service.Core.Client.Models;
+using Service.Core.Client.Services;
+using Service.EducationPersonalApi.Constants;
 using Service.EducationPersonalApi.Mappers;
 using Service.EducationPersonalApi.Models;
+using Service.TimeLogger.Grpc.Models;
 using Service.TutorialPersonal.Grpc;
 using Service.TutorialPersonal.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -31,12 +34,19 @@ namespace Service.EducationPersonalApi.Controllers
 		private readonly ITutorialPersonalService _tutorialService;
 		private readonly IUserInfoService _userInfoService;
 		private readonly IUserRewardService _userRewardService;
+		private readonly IEncoderDecoder _encoderDecoder;
+		private readonly ISystemClock _systemClock;
 
-		public EducationPersonalController(ITutorialPersonalService tutorialService, IUserInfoService userInfoService, IUserRewardService userRewardService)
+		public EducationPersonalController(ITutorialPersonalService tutorialService, 
+			IUserInfoService userInfoService, 
+			IUserRewardService userRewardService, 
+			IEncoderDecoder encoderDecoder, ISystemClock systemClock)
 		{
 			_tutorialService = tutorialService;
 			_userInfoService = userInfoService;
 			_userRewardService = userRewardService;
+			_encoderDecoder = encoderDecoder;
+			_systemClock = systemClock;
 		}
 
 		[HttpPost("started")]
@@ -86,6 +96,31 @@ namespace Service.EducationPersonalApi.Controllers
 			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
 		}
 
+		private async ValueTask<IActionResult> ProcessTask<TGrpcResponse, TModelResponse>(
+			int unit, int task, TaskRequestBase request,
+			Func<Guid?, TimeSpan, ValueTask<TGrpcResponse>> grpcRequestFunc,
+			Func<TGrpcResponse, TModelResponse> responseFunc)
+		{
+			Guid? userId = await GetUserIdAsync();
+			if (userId == null)
+				return StatusResponse.Error(ResponseCode.UserNotFound);
+
+			var timeLogData = _encoderDecoder.DecodeProto<TaskTimeLogGrpcRequest>(request.TimeToken);
+			if (timeLogData == null)
+				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
+
+			if (timeLogData.Tutorial != EducationTutorial.PersonalFinance || timeLogData.Unit != unit || timeLogData.Task != task)
+				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
+
+			TimeSpan duration = _systemClock.Now.Subtract(timeLogData.StartDate);
+			if (duration == TimeSpan.Zero)
+				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
+
+			TGrpcResponse response = await grpcRequestFunc.Invoke(userId, duration);
+
+			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
+		}
+
 		private async ValueTask<Guid?> GetUserIdAsync()
 		{
 			UserInfoResponse userInfoResponse = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest
@@ -102,31 +137,31 @@ namespace Service.EducationPersonalApi.Controllers
 		[OpenApiTag("Unit1")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TextAsync([FromBody] TaskTextRequest request) =>
-			await Process(userId => _tutorialService.Unit1TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(1, 1, request, (userId, timespan) => _tutorialService.Unit1TextAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit1/test")]
 		[OpenApiTag("Unit1")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TestAsync([FromBody] TaskTestRequest request) =>
-			await Process(userId => _tutorialService.Unit1TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(1, 2, request, (userId, timespan) => _tutorialService.Unit1TestAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit1/case")]
 		[OpenApiTag("Unit1")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1CaseAsync([FromBody] TaskCaseRequest request) =>
-			await Process(userId => _tutorialService.Unit1CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(1, 3, request, (userId, timespan) => _tutorialService.Unit1CaseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit1/truefalse")]
 		[OpenApiTag("Unit1")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
-			await Process(userId => _tutorialService.Unit1TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(1, 4, request, (userId, timespan) => _tutorialService.Unit1TrueFalseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit1/game")]
 		[OpenApiTag("Unit1")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1GameAsync([FromBody] TaskGameRequest request) =>
-			await Process(userId => _tutorialService.Unit1GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(1, 5, request, (userId, timespan) => _tutorialService.Unit1GameAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		#endregion
 
@@ -136,31 +171,31 @@ namespace Service.EducationPersonalApi.Controllers
 		[OpenApiTag("Unit2")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2TextAsync([FromBody] TaskTextRequest request) =>
-			await Process(userId => _tutorialService.Unit2TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(2, 1, request, (userId, timespan) => _tutorialService.Unit2TextAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit2/test")]
 		[OpenApiTag("Unit2")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2TestAsync([FromBody] TaskTestRequest request) =>
-			await Process(userId => _tutorialService.Unit2TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(2, 2, request, (userId, timespan) => _tutorialService.Unit2TestAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit2/case")]
 		[OpenApiTag("Unit2")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2CaseAsync([FromBody] TaskCaseRequest request) =>
-			await Process(userId => _tutorialService.Unit2CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(2, 3, request, (userId, timespan) => _tutorialService.Unit2CaseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit2/truefalse")]
 		[OpenApiTag("Unit2")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
-			await Process(userId => _tutorialService.Unit2TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(2, 4, request, (userId, timespan) => _tutorialService.Unit2TrueFalseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit2/game")]
 		[OpenApiTag("Unit2")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2GameAsync([FromBody] TaskGameRequest request) =>
-			await Process(userId => _tutorialService.Unit2GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(2, 5, request, (userId, timespan) => _tutorialService.Unit2GameAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		#endregion
 
@@ -170,31 +205,31 @@ namespace Service.EducationPersonalApi.Controllers
 		[OpenApiTag("Unit3")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3TextAsync([FromBody] TaskTextRequest request) =>
-			await Process(userId => _tutorialService.Unit3TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(3, 1, request, (userId, timespan) => _tutorialService.Unit3TextAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit3/test")]
 		[OpenApiTag("Unit3")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3TestAsync([FromBody] TaskTestRequest request) =>
-			await Process(userId => _tutorialService.Unit3TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(3, 2, request, (userId, timespan) => _tutorialService.Unit3TestAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit3/case")]
 		[OpenApiTag("Unit3")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3CaseAsync([FromBody] TaskCaseRequest request) =>
-			await Process(userId => _tutorialService.Unit3CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(3, 3, request, (userId, timespan) => _tutorialService.Unit3CaseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit3/truefalse")]
 		[OpenApiTag("Unit3")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
-			await Process(userId => _tutorialService.Unit3TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(3, 4, request, (userId, timespan) => _tutorialService.Unit3TrueFalseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit3/game")]
 		[OpenApiTag("Unit3")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3GameAsync([FromBody] TaskGameRequest request) =>
-			await Process(userId => _tutorialService.Unit3GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(3, 5, request, (userId, timespan) => _tutorialService.Unit3GameAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		#endregion
 
@@ -204,31 +239,31 @@ namespace Service.EducationPersonalApi.Controllers
 		[OpenApiTag("Unit4")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4TextAsync([FromBody] TaskTextRequest request) =>
-			await Process(userId => _tutorialService.Unit4TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(4, 1, request, (userId, timespan) => _tutorialService.Unit4TextAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit4/test")]
 		[OpenApiTag("Unit4")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4TestAsync([FromBody] TaskTestRequest request) =>
-			await Process(userId => _tutorialService.Unit4TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(4, 2, request, (userId, timespan) => _tutorialService.Unit4TestAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit4/case")]
 		[OpenApiTag("Unit4")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4CaseAsync([FromBody] TaskCaseRequest request) =>
-			await Process(userId => _tutorialService.Unit4CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(4, 3, request, (userId, timespan) => _tutorialService.Unit4CaseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit4/truefalse")]
 		[OpenApiTag("Unit4")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
-			await Process(userId => _tutorialService.Unit4TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(4, 4, request, (userId, timespan) => _tutorialService.Unit4TrueFalseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit4/game")]
 		[OpenApiTag("Unit4")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4GameAsync([FromBody] TaskGameRequest request) =>
-			await Process(userId => _tutorialService.Unit4GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(4, 5, request, (userId, timespan) => _tutorialService.Unit4GameAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		#endregion
 
@@ -238,31 +273,31 @@ namespace Service.EducationPersonalApi.Controllers
 		[OpenApiTag("Unit5")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5TextAsync([FromBody] TaskTextRequest request) =>
-			await Process(userId => _tutorialService.Unit5TextAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(5, 1, request, (userId, timespan) => _tutorialService.Unit5TextAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit5/test")]
 		[OpenApiTag("Unit5")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5TestAsync([FromBody] TaskTestRequest request) =>
-			await Process(userId => _tutorialService.Unit5TestAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(5, 2, request, (userId, timespan) => _tutorialService.Unit5TestAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit5/case")]
 		[OpenApiTag("Unit5")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5CaseAsync([FromBody] TaskCaseRequest request) =>
-			await Process(userId => _tutorialService.Unit5CaseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(5, 3, request, (userId, timespan) => _tutorialService.Unit5CaseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit5/truefalse")]
 		[OpenApiTag("Unit5")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5TrueFalseAsync([FromBody] TaskTrueFalseRequest request) =>
-			await Process(userId => _tutorialService.Unit5TrueFalseAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(5, 4, request, (userId, timespan) => _tutorialService.Unit5TrueFalseAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		[HttpPost("unit5/game")]
 		[OpenApiTag("Unit5")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5GameAsync([FromBody] TaskGameRequest request) =>
-			await Process(userId => _tutorialService.Unit5GameAsync(request.ToGrpcModel(userId)), grpc => grpc.ToModel());
+			await ProcessTask(5, 5, request, (userId, timespan) => _tutorialService.Unit5GameAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
 		#endregion
 	}

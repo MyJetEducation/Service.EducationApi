@@ -10,9 +10,7 @@ namespace Service.EducationPersonalApi.Models
 		public bool IsRetry { get; set; }
 
 		[Required]
-		[Range(1, int.MaxValue)]
-		[DefaultValue(0)]
-		[Description("Milliseconds")]
-		public int Duration { get; set; }
+		[Description("Token from TimeLogger service")]
+		public string TimeToken { get; set; }
 	}
 }

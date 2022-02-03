@@ -17,18 +17,19 @@ namespace Service.EducationPersonalApi
 	{
 		private const string JwtSecretName = "JWT_SECRET";
 		private const string SettingsFileName = ".myjeteducation";
+		private const string EncodingKeyStr = "ENCODING_KEY";
 
 		public static SettingsModel Settings { get; private set; }
-
 		public static ILoggerFactory LogFactory { get; private set; }
-
 		public static string JwtSecret { get; private set; }
+		public static string EncodingKey { get; set; }
 
 		public static void Main(string[] args)
 		{
 			Console.Title = "MyJetEducation Service.EducationPersonalApi";
 			LoadJwtSecret();
 			Settings = LoadSettings();
+			GetEnvVariables();
 
 			using ILoggerFactory loggerFactory = LogConfigurator.ConfigureElk("MyJetEducation", Settings.SeqServiceUrl, Settings.ElkLogs);
 			ILogger<Program> logger = loggerFactory.CreateLogger<Program>();
@@ -93,5 +94,15 @@ namespace Service.EducationPersonalApi
 					services.AddSingleton(loggerFactory);
 					services.AddSingleton(typeof (ILogger<>), typeof (Logger<>));
 				});
+
+		private static void GetEnvVariables()
+		{
+			string key = Environment.GetEnvironmentVariable(EncodingKeyStr);
+
+			if (key.IsNullOrEmpty())
+				throw new Exception($"Env Variable {EncodingKeyStr} is not found");
+
+			EncodingKey = key;
+		}
 	}
 }
