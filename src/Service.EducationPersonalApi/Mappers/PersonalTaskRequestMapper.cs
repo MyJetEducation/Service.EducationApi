@@ -26,6 +26,14 @@ namespace Service.EducationPersonalApi.Mappers
 			}).ToArray()
 		};
 
+		public static PersonalTaskVideoGrpcRequest ToGrpcModel(this TaskVideoRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskTestGrpcRequest
+		{
+			UserId = userId,
+			IsRetry = model.IsRetry,
+			Duration = duration,
+			Passed = model.Passed
+		};
+
 		public static PersonalTaskCaseGrpcRequest ToGrpcModel(this TaskCaseRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskCaseGrpcRequest
 		{
 			UserId = userId,
