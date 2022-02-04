@@ -75,12 +75,12 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("state")]
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<FinishUnitResponse>), Description = "Ok")]
-		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody, Required] int unit)
+		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody] GetFinishStateRequest request)
 		{
-			if (EducationHelper.GetUnit(EducationTutorial.PersonalFinance, unit) == null)
+			if (EducationHelper.GetUnit(EducationTutorial.PersonalFinance, request.Unit) == null)
 				return StatusResponse.Error(ResponseCode.NotValidEducationRequestData);
 
-			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = unit}), grpc => grpc.ToModel());
+			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = request.Unit}), grpc => grpc.ToModel());
 		}
 
 		private async ValueTask<IActionResult> Process<TGrpcResponse, TModelResponse>(
