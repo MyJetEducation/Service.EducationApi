@@ -28,7 +28,8 @@ namespace Service.EducationPersonalApi.Mappers
 			? new FinishUnitResponse
 			{
 				Unit = grpcResponse.Unit?.ToModel(),
-				TotalProgress = grpcResponse.TotalProgress.ToModel()
+				TrueFalseProgress = grpcResponse.TrueFalseProgress,
+				CaseProgress = grpcResponse.CaseProgress
 			}
 			: null;
 

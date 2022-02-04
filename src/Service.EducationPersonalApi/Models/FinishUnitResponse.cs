@@ -4,6 +4,8 @@
 	{
 		public PersonalStateUnit Unit { get; set; }
 
-		public TotalProgressResponse TotalProgress { get; set; }
+		public int TrueFalseProgress { get; set; }
+
+		public int CaseProgress { get; set; }
 	}
 }
