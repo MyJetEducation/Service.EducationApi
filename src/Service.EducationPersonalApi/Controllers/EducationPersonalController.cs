@@ -1,52 +1,37 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
 using Service.Core.Client.Constants;
 using Service.Core.Client.Education;
 using Service.Core.Client.Models;
 using Service.Core.Client.Services;
-using Service.EducationPersonalApi.Constants;
 using Service.EducationPersonalApi.Mappers;
 using Service.EducationPersonalApi.Models;
-using Service.TimeLogger.Grpc.Models;
 using Service.TutorialPersonal.Grpc;
 using Service.TutorialPersonal.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Models;
 using Service.UserReward.Grpc;
 using Service.UserReward.Grpc.Models;
 
 namespace Service.EducationPersonalApi.Controllers
 {
-	[Authorize]
-	[ApiController]
-	[ProducesResponseType(StatusCodes.Status200OK)]
-	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-	[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
 	[Route("/api/v1/education/personal")]
-	public class EducationPersonalController : ControllerBase
+	public class EducationPersonalController : BaseController
 	{
 		private readonly ITutorialPersonalService _tutorialService;
-		private readonly IUserInfoService _userInfoService;
 		private readonly IUserRewardService _userRewardService;
-		private readonly IEncoderDecoder _encoderDecoder;
-		private readonly ISystemClock _systemClock;
 
-		public EducationPersonalController(ITutorialPersonalService tutorialService, 
-			IUserInfoService userInfoService, 
-			IUserRewardService userRewardService, 
-			IEncoderDecoder encoderDecoder, ISystemClock systemClock)
+		public EducationPersonalController(ITutorialPersonalService tutorialService,
+			IUserInfoService userInfoService,
+			IUserRewardService userRewardService,
+			IEncoderDecoder encoderDecoder, ISystemClock systemClock,
+			ILogger<EducationPersonalController> logger) : base(systemClock, encoderDecoder, userInfoService, logger)
 		{
-			_tutorialService = tutorialService;
-			_userInfoService = userInfoService;
 			_userRewardService = userRewardService;
-			_encoderDecoder = encoderDecoder;
-			_systemClock = systemClock;
+			_tutorialService = tutorialService;
 		}
 
 		[HttpPost("started")]
@@ -83,54 +68,6 @@ namespace Service.EducationPersonalApi.Controllers
 			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = request.Unit}), grpc => grpc.ToModel());
 		}
 
-		private async ValueTask<IActionResult> Process<TGrpcResponse, TModelResponse>(
-			Func<Guid?, ValueTask<TGrpcResponse>> grpcRequestFunc,
-			Func<TGrpcResponse, TModelResponse> responseFunc)
-		{
-			Guid? userId = await GetUserIdAsync();
-			if (userId == null)
-				return StatusResponse.Error(ResponseCode.UserNotFound);
-
-			TGrpcResponse response = await grpcRequestFunc.Invoke(userId);
-
-			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
-		}
-
-		private async ValueTask<IActionResult> ProcessTask<TGrpcResponse, TModelResponse>(
-			int unit, int task, TaskRequestBase request,
-			Func<Guid?, TimeSpan, ValueTask<TGrpcResponse>> grpcRequestFunc,
-			Func<TGrpcResponse, TModelResponse> responseFunc)
-		{
-			Guid? userId = await GetUserIdAsync();
-			if (userId == null)
-				return StatusResponse.Error(ResponseCode.UserNotFound);
-
-			var timeLogData = _encoderDecoder.DecodeProto<TaskTimeLogGrpcRequest>(request.TimeToken);
-			if (timeLogData == null)
-				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
-
-			if (timeLogData.Tutorial != EducationTutorial.PersonalFinance || timeLogData.Unit != unit || timeLogData.Task != task)
-				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
-
-			TimeSpan duration = _systemClock.Now.Subtract(timeLogData.StartDate);
-			if (duration == TimeSpan.Zero)
-				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
-
-			TGrpcResponse response = await grpcRequestFunc.Invoke(userId, duration);
-
-			return DataResponse<TModelResponse>.Ok(responseFunc.Invoke(response));
-		}
-
-		private async ValueTask<Guid?> GetUserIdAsync()
-		{
-			UserInfoResponse userInfoResponse = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest
-			{
-				UserName = User.Identity?.Name
-			});
-
-			return userInfoResponse?.UserInfo?.UserId;
-		}
-
 		#region Unit1 (Your income)
 
 		[HttpPost("unit1/text")]
@@ -147,7 +84,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("unit1/video")]
 		[OpenApiTag("Unit1")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit1VideoAsync([FromBody] TaskVideoRequest request) =>
 			await ProcessTask(1, 3, request, (userId, timespan) => _tutorialService.Unit1VideoAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
@@ -187,7 +124,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("unit2/video")]
 		[OpenApiTag("Unit2")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit2VideoAsync([FromBody] TaskVideoRequest request) =>
 			await ProcessTask(2, 3, request, (userId, timespan) => _tutorialService.Unit2VideoAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
@@ -227,7 +164,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("unit3/video")]
 		[OpenApiTag("Unit3")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit3VideoAsync([FromBody] TaskVideoRequest request) =>
 			await ProcessTask(3, 3, request, (userId, timespan) => _tutorialService.Unit3VideoAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
@@ -267,7 +204,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("unit4/video")]
 		[OpenApiTag("Unit4")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit4VideoAsync([FromBody] TaskVideoRequest request) =>
 			await ProcessTask(4, 3, request, (userId, timespan) => _tutorialService.Unit4VideoAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 
@@ -307,7 +244,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		[HttpPost("unit5/video")]
 		[OpenApiTag("Unit5")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof(DataResponse<TestScoreResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TestScoreResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> Unit5VideoAsync([FromBody] TaskVideoRequest request) =>
 			await ProcessTask(5, 3, request, (userId, timespan) => _tutorialService.Unit5VideoAsync(request.ToGrpcModel(userId, timespan)), grpc => grpc.ToModel());
 

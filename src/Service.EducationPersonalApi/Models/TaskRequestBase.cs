@@ -5,7 +5,6 @@ namespace Service.EducationPersonalApi.Models
 {
 	public class TaskRequestBase
 	{
-		[Required]
 		[DefaultValue(false)]
 		public bool IsRetry { get; set; }
 
