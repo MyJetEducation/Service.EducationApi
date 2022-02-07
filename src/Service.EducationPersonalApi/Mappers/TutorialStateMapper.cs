@@ -5,7 +5,7 @@ using Enum = System.Enum;
 
 namespace Service.EducationPersonalApi.Mappers
 {
-	public static class PersonalStateMapper
+	public static class TutorialStateMapper
 	{
 		public static TestScoreResponse ToModel(this TestScoreGrpcResponse response) => response != null
 			? new TestScoreResponse
@@ -15,8 +15,8 @@ namespace Service.EducationPersonalApi.Mappers
 			}
 			: null;
 
-		public static PersonalStateResponse ToModel(this PersonalStateGrpcResponse response) => response != null
-			? new PersonalStateResponse
+		public static TutorialStateResponse ToModel(this PersonalStateGrpcResponse response) => response != null
+			? new TutorialStateResponse
 			{
 				Available = response.Available,
 				Units = response.Units?.Select(unit => unit.ToModel()),
@@ -51,8 +51,8 @@ namespace Service.EducationPersonalApi.Mappers
 			}
 			: null;
 
-		private static PersonalStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
-			? new PersonalStateUnit
+		private static TutorialStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
+			? new TutorialStateUnit
 			{
 				Unit = grpcModel.Unit,
 				TestScore = grpcModel.TestScore,
@@ -60,8 +60,8 @@ namespace Service.EducationPersonalApi.Mappers
 			}
 			: null;
 
-		private static PersonalStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
-			? new PersonalStateTask
+		private static TutorialStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
+			? new TutorialStateTask
 			{
 				Task = grpcModel.Task,
 				TestScore = grpcModel.TestScore,

@@ -2,11 +2,11 @@
 
 namespace Service.EducationPersonalApi.Models
 {
-	public class PersonalStateResponse
+	public class TutorialStateResponse
 	{
 		public bool Available { get; set; }
 
-		public IEnumerable<PersonalStateUnit> Units { get; set; }
+		public IEnumerable<TutorialStateUnit> Units { get; set; }
 
 		public TotalProgressResponse TotalProgress { get; set; }
 	}

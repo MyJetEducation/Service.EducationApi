@@ -1,6 +1,6 @@
 ﻿namespace Service.EducationPersonalApi.Models
 {
-	public class PersonalStateTask
+	public class TutorialStateTask
 	{
 		public int Task { get; set; }
 

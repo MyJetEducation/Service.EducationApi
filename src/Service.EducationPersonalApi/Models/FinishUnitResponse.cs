@@ -2,7 +2,7 @@
 {
 	public class FinishUnitResponse
 	{
-		public PersonalStateUnit Unit { get; set; }
+		public TutorialStateUnit Unit { get; set; }
 
 		public int TrueFalseProgress { get; set; }
 

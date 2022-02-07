@@ -19,23 +19,23 @@ using Service.UserReward.Grpc.Models;
 namespace Service.EducationPersonalApi.Controllers
 {
 	[Route("/api/v1/education/personal")]
-	public class EducationPersonalController : BaseController
+	public class EducationController : BaseController
 	{
 		private readonly ITutorialPersonalService _tutorialService;
 		private readonly IUserRewardService _userRewardService;
 
-		public EducationPersonalController(ITutorialPersonalService tutorialService,
+		public EducationController(ITutorialPersonalService tutorialService,
 			IUserInfoService userInfoService,
 			IUserRewardService userRewardService,
 			IEncoderDecoder encoderDecoder, ISystemClock systemClock,
-			ILogger<EducationPersonalController> logger) : base(systemClock, encoderDecoder, userInfoService, logger)
+			ILogger<EducationController> logger) : base(systemClock, encoderDecoder, userInfoService, logger)
 		{
 			_userRewardService = userRewardService;
 			_tutorialService = tutorialService;
 		}
 
 		[HttpPost("started")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<PersonalStateResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TutorialStateResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> LearningStartedAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
@@ -54,7 +54,7 @@ namespace Service.EducationPersonalApi.Controllers
 		}
 
 		[HttpPost("dashboard")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<PersonalStateResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TutorialStateResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetDashboardStateAsync() =>
 			await Process(userId => _tutorialService.GetDashboardStateAsync(new PersonalSelectTaskUnitGrpcRequest {UserId = userId}), grpc => grpc.ToModel());
 

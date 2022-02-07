@@ -9,7 +9,6 @@ using NSwag.Annotations;
 using Service.Core.Client.Constants;
 using Service.Core.Client.Education;
 using Service.Core.Client.Services;
-using Service.EducationPersonalApi.Constants;
 using Service.EducationPersonalApi.Models;
 using Service.TimeLogger.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
@@ -27,12 +26,12 @@ namespace Service.EducationPersonalApi.Controllers
 		private readonly ISystemClock _systemClock;
 		private readonly IEncoderDecoder _encoderDecoder;
 		private readonly IUserInfoService _userInfoService;
-		private readonly ILogger<EducationPersonalController> _logger;
+		private readonly ILogger _logger;
 
 		public BaseController(ISystemClock systemClock,
 			IEncoderDecoder encoderDecoder,
 			IUserInfoService userInfoService,
-			ILogger<EducationPersonalController> logger)
+			ILogger<EducationController> logger)
 		{
 			_systemClock = systemClock;
 			_encoderDecoder = encoderDecoder;
@@ -64,7 +63,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 			TimeSpan? duration = GetTimeTokenDuration(request.TimeToken, userId, unit, task);
 			if (duration == null)
-				return StatusResponse.Error(EducationPersonalResponseCode.InvalidTimeToken);
+				return StatusResponse.Error(ResponseCode.InvalidTimeToken);
 
 			TGrpcResponse response = await grpcRequestFunc.Invoke(userId, duration.Value);
 

@@ -5,7 +5,7 @@ using Service.TutorialPersonal.Grpc.Models;
 
 namespace Service.EducationPersonalApi.Mappers
 {
-	public static class PersonalTaskRequestMapper
+	public static class TaskRequestMapper
 	{
 		public static PersonalTaskTextGrpcRequest ToGrpcModel(this TaskTextRequest model, Guid? userId, TimeSpan duration) => new PersonalTaskTextGrpcRequest
 		{
