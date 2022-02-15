@@ -1,4 +1,5 @@
-﻿using Service.Core.Client.Constants;
+﻿using System.ComponentModel.DataAnnotations;
+using Service.Core.Client.Constants;
 
 namespace Service.EducationPersonalApi.Models
 {
@@ -16,6 +17,7 @@ namespace Service.EducationPersonalApi.Models
 
 		public int Text { get; set; }
 
+		[EnumDataType(typeof (UserAchievement))]
 		public UserAchievement[] Achievements { get; set; }
 	}
 }

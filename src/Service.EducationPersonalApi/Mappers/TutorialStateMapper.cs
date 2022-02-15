@@ -31,7 +31,7 @@ namespace Service.EducationPersonalApi.Mappers
 			? new TutorialStateUnit
 			{
 				Unit = grpcModel.Unit,
-				TestScore = grpcModel.TestScore,
+				TaskScore = grpcModel.TestScore,
 				Tasks = grpcModel.Tasks?.Select(task => task.ToModel())
 			}
 			: null;
@@ -40,7 +40,7 @@ namespace Service.EducationPersonalApi.Mappers
 			? new TutorialStateTask
 			{
 				Task = grpcModel.Task,
-				TestScore = grpcModel.TestScore,
+				TaskScore = grpcModel.TestScore,
 				Retry = grpcModel.RetryInfo.ToModel()
 			}
 			: null;
