@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Service.EducationPersonalApi.Models;
 using Service.TutorialPersonal.Grpc.Models.State;
-using Enum = System.Enum;
 
 namespace Service.EducationPersonalApi.Mappers
 {
@@ -15,43 +14,20 @@ namespace Service.EducationPersonalApi.Mappers
 			}
 			: null;
 
-		public static TutorialStateResponse ToModel(this PersonalStateGrpcResponse response) => response != null
-			? new TutorialStateResponse
+		public static FinishStateResponse ToModel(this FinishStateGrpcResponse grpcResponse) => grpcResponse != null
+			? new FinishStateResponse
 			{
-				Available = response.Available,
-				Units = response.Units?.Select(unit => unit.ToModel()),
-				TotalProgress = response.TotalProgress.ToModel()
+				Case = grpcResponse.Case,
+				Game = grpcResponse.Game,
+				Test = grpcResponse.Test,
+				Text = grpcResponse.Text,
+				Video = grpcResponse.Video,
+				TrueFalse = grpcResponse.TrueFalse,
+				Achievements = grpcResponse.Achievements
 			}
 			: null;
 
-		public static FinishUnitResponse ToModel(this FinishUnitGrpcResponse grpcResponse) => grpcResponse != null
-			? new FinishUnitResponse
-			{
-				Unit = grpcResponse.Unit?.ToModel(),
-				TrueFalseProgress = grpcResponse.TrueFalseProgress,
-				CaseProgress = grpcResponse.CaseProgress
-			}
-			: null;
-
-		private static TotalProgressResponse ToModel(this TotalProgressStateGrpcModel grpcModel) => grpcModel != null
-			? new TotalProgressResponse
-			{
-				Habit = grpcModel.Habit.ToModel(),
-				Skill = grpcModel.Skill.ToModel(),
-				Achievements = grpcModel.Achievements?.Select(Enum.GetName).ToArray()
-			}
-			: null;
-
-		private static TotalProgressItemResponse ToModel(this ProgressItemInfoGrpcModel grpcModel) => grpcModel != null
-			? new TotalProgressItemResponse
-			{
-				Index = grpcModel.Index,
-				Count = grpcModel.Count,
-				Progress = grpcModel.Progress
-			}
-			: null;
-
-		private static TutorialStateUnit ToModel(this PersonalStateUnitGrpcModel grpcModel) => grpcModel != null
+		private static TutorialStateUnit ToModel(this UnitStateGrpcModel grpcModel) => grpcModel != null
 			? new TutorialStateUnit
 			{
 				Unit = grpcModel.Unit,
@@ -60,7 +36,7 @@ namespace Service.EducationPersonalApi.Mappers
 			}
 			: null;
 
-		private static TutorialStateTask ToModel(this PersonalStateTaskGrpcModel grpcModel) => grpcModel != null
+		private static TutorialStateTask ToModel(this TaskStateGrpcModel grpcModel) => grpcModel != null
 			? new TutorialStateTask
 			{
 				Task = grpcModel.Task,

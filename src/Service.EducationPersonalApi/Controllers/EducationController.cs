@@ -36,7 +36,7 @@ namespace Service.EducationPersonalApi.Controllers
 		}
 
 		[HttpPost("started")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TutorialStateResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<StatusResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> LearningStartedAsync()
 		{
 			Guid? userId = await GetUserIdAsync();
@@ -54,16 +54,11 @@ namespace Service.EducationPersonalApi.Controllers
 			return StatusResponse.Result(response.IsSuccess);
 		}
 
-		[HttpPost("dashboard")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<TutorialStateResponse>), Description = "Ok")]
-		public async ValueTask<IActionResult> GetDashboardStateAsync() =>
-			await Process(userId => _tutorialService.GetDashboardStateAsync(new PersonalSelectTaskUnitGrpcRequest {UserId = userId}), grpc => grpc.ToModel());
-
 		[HttpPost("state")]
-		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<FinishUnitResponse>), Description = "Ok")]
+		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<FinishStateResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> GetFinishStateAsync([FromBody] GetFinishStateRequest request)
 		{
-			if (EducationHelper.GetUnit(EducationTutorial.PersonalFinance, request.Unit) == null)
+			if (request.Unit != null && EducationHelper.GetUnit(EducationTutorial.PersonalFinance, request.Unit.Value) == null)
 				return StatusResponse.Error(ResponseCode.NotValidEducationRequestData);
 
 			return await Process(userId => _tutorialService.GetFinishStateAsync(new GetFinishStateGrpcRequest {UserId = userId, Unit = request.Unit}), grpc => grpc.ToModel());
