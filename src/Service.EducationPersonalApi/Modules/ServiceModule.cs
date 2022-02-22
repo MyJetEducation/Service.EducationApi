@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.Extensions.Logging;
 using Service.Core.Client.Services;
 using Service.TutorialPersonal.Client;
 using Service.UserInfo.Crud.Client;
@@ -10,7 +11,8 @@ namespace Service.EducationPersonalApi.Modules
 	{
 		protected override void Load(ContainerBuilder builder)
 		{
-			builder.RegisterUserInfoCrudClient(Program.Settings.UserInfoCrudServiceUrl);
+			builder.RegisterUserInfoCrudClient(Program.Settings.UserInfoCrudServiceUrl, Program.LogFactory.CreateLogger(typeof(UserInfoCrudClientFactory)));
+
 			builder.RegisterTutorialPersonalClient(Program.Settings.TutorialPersonalServiceUrl);
 			builder.RegisterUserRewardClient(Program.Settings.UserRewardServiceUrl);
 

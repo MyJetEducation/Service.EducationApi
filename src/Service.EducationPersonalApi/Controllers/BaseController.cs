@@ -10,6 +10,7 @@ using Service.Core.Client.Constants;
 using Service.Core.Client.Services;
 using Service.Education.Structure;
 using Service.EducationPersonalApi.Models;
+using Service.Grpc;
 using Service.TimeLogger.Grpc.Models;
 using Service.UserInfo.Crud.Grpc;
 using Service.UserInfo.Crud.Grpc.Models;
@@ -25,12 +26,12 @@ namespace Service.EducationPersonalApi.Controllers
 	{
 		private readonly ISystemClock _systemClock;
 		private readonly IEncoderDecoder _encoderDecoder;
-		private readonly IUserInfoService _userInfoService;
+		private readonly IGrpcServiceProxy<IUserInfoService> _userInfoService;
 		private readonly ILogger _logger;
 
 		public BaseController(ISystemClock systemClock,
 			IEncoderDecoder encoderDecoder,
-			IUserInfoService userInfoService,
+			IGrpcServiceProxy<IUserInfoService> userInfoService,
 			ILogger<EducationController> logger)
 		{
 			_systemClock = systemClock;
@@ -96,7 +97,7 @@ namespace Service.EducationPersonalApi.Controllers
 
 		protected async ValueTask<Guid?> GetUserIdAsync()
 		{
-			UserInfoResponse userInfoResponse = await _userInfoService.GetUserInfoByLoginAsync(new UserInfoAuthRequest
+			UserInfoResponse userInfoResponse = await _userInfoService.Service.GetUserInfoByLoginAsync(new UserInfoAuthRequest
 			{
 				UserName = User.Identity?.Name
 			});
