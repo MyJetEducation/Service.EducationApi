@@ -10,10 +10,7 @@ using Service.Core.Client.Constants;
 using Service.Core.Client.Services;
 using Service.Education.Structure;
 using Service.EducationPersonalApi.Models;
-using Service.Grpc;
 using Service.TimeLogger.Grpc.Models;
-using Service.UserInfo.Crud.Grpc;
-using Service.UserInfo.Crud.Grpc.Models;
 
 namespace Service.EducationPersonalApi.Controllers
 {
@@ -26,17 +23,12 @@ namespace Service.EducationPersonalApi.Controllers
 	{
 		private readonly ISystemClock _systemClock;
 		private readonly IEncoderDecoder _encoderDecoder;
-		private readonly IGrpcServiceProxy<IUserInfoService> _userInfoService;
 		private readonly ILogger _logger;
 
-		public BaseController(ISystemClock systemClock,
-			IEncoderDecoder encoderDecoder,
-			IGrpcServiceProxy<IUserInfoService> userInfoService,
-			ILogger<EducationController> logger)
+		public BaseController(ISystemClock systemClock, IEncoderDecoder encoderDecoder, ILogger<EducationController> logger)
 		{
 			_systemClock = systemClock;
 			_encoderDecoder = encoderDecoder;
-			_userInfoService = userInfoService;
 			_logger = logger;
 		}
 
@@ -44,7 +36,7 @@ namespace Service.EducationPersonalApi.Controllers
 			Func<Guid?, ValueTask<TGrpcResponse>> grpcRequestFunc,
 			Func<TGrpcResponse, TModelResponse> responseFunc)
 		{
-			Guid? userId = await GetUserIdAsync();
+			Guid? userId = GetUserId();
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
@@ -58,7 +50,7 @@ namespace Service.EducationPersonalApi.Controllers
 			Func<Guid?, TimeSpan, ValueTask<TGrpcResponse>> grpcRequestFunc,
 			Func<TGrpcResponse, TModelResponse> responseFunc)
 		{
-			Guid? userId = await GetUserIdAsync();
+			Guid? userId = GetUserId();
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
@@ -95,14 +87,6 @@ namespace Service.EducationPersonalApi.Controllers
 			return span == TimeSpan.Zero ? (TimeSpan?) null : span;
 		}
 
-		protected async ValueTask<Guid?> GetUserIdAsync()
-		{
-			UserInfoResponse userInfoResponse = await _userInfoService.Service.GetUserInfoByLoginAsync(new UserInfoAuthRequest
-			{
-				UserName = User.Identity?.Name
-			});
-
-			return userInfoResponse?.UserInfo?.UserId;
-		}
+		protected Guid? GetUserId() => Guid.TryParse(User.Identity?.Name, out Guid uid) ? (Guid?)uid : null;
 	}
 }
