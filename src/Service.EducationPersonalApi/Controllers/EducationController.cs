@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
-using Service.Core.Client.Constants;
 using Service.Core.Client.Models;
 using Service.Core.Client.Services;
 using Service.Education.Helpers;
@@ -15,6 +14,7 @@ using Service.TutorialPersonal.Grpc;
 using Service.TutorialPersonal.Grpc.Models;
 using Service.UserReward.Grpc;
 using Service.UserReward.Grpc.Models;
+using Service.Web;
 
 namespace Service.EducationPersonalApi.Controllers
 {
@@ -49,7 +49,7 @@ namespace Service.EducationPersonalApi.Controllers
 				Task = 1
 			});
 
-			return StatusResponse.Result(response.IsSuccess);
+			return StatusResponse.Result(response);
 		}
 
 		[HttpPost("state")]

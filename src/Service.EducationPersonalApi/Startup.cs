@@ -7,25 +7,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyJetWallet.Sdk.Service;
 using Prometheus;
+using Service.Core.Client.Constants;
 using Service.EducationPersonalApi.Modules;
+using Service.Web;
 using SimpleTrading.ServiceStatusReporterConnector;
 
 namespace Service.EducationPersonalApi
 {
 	public class Startup
 	{
+		private const string DocumentName = "education/personal";
+		private const string ApiName = "EducationPersonalApi";
+
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.BindCodeFirstGrpc();
 			services.AddHostedService<ApplicationLifetimeManager>();
-			services.AddMyTelemetry("ED-", Program.Settings.ZipkinUrl);
-			services.SetupSwaggerDocumentation();
+			services.AddMyTelemetry(Configuration.TelemetryPrefix, Program.Settings.ZipkinUrl);
+			services.SetupSwaggerDocumentation(DocumentName, ApiName);
 			services.ConfigurateHeaders();
 			services.AddControllers();
-
-			services
-				.AddAuthentication(StartupUtils.ConfigureAuthenticationOptions)
-				.AddJwtBearer(StartupUtils.ConfigureJwtBearerOptions);
+			services.ConfigureAuthentication();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -43,12 +45,12 @@ namespace Service.EducationPersonalApi
 			app.UseSwaggerUi3();
 			app.UseAuthentication();
 			app.UseAuthorization();
-			app.SetupSwagger();
+			app.SetupSwagger(DocumentName, ApiName);
 
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
-				endpoints.MapGet("/", async context => await context.Response.WriteAsync("MyJetEducation API endpoint"));
+				endpoints.MapGet("/", async context => await context.Response.WriteAsync("API endpoint"));
 			});
 		}
 

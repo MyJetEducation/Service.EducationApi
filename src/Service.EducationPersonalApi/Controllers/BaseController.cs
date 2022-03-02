@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSwag.Annotations;
-using Service.Core.Client.Constants;
 using Service.Core.Client.Services;
 using Service.Education.Structure;
 using Service.EducationPersonalApi.Models;
 using Service.TimeLogger.Grpc.Models;
+using Service.Web;
 
 namespace Service.EducationPersonalApi.Controllers
 {

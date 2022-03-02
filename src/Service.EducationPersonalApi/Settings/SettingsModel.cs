@@ -17,9 +17,6 @@ namespace Service.EducationPersonalApi.Settings
 		[YamlProperty("EducationPersonalApi.TutorialPersonalServiceUrl")]
 		public string TutorialPersonalServiceUrl { get; set; }
 
-		[YamlProperty("EducationPersonalApi.JwtAudience")]
-		public string JwtAudience { get; set; }
-
 		[YamlProperty("EducationPersonalApi.UserRewardServiceUrl")]
 		public string UserRewardServiceUrl { get; set; }
 	}
