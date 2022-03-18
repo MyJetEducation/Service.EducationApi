@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Service.EducationPersonalApi.Models;
 using Service.TutorialPersonal.Grpc.Models.State;
+using Service.TutorialPersonal.Grpc.Models.Task;
 
 namespace Service.EducationPersonalApi.Mappers
 {

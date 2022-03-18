@@ -12,7 +12,7 @@ using Service.EducationPersonalApi.Mappers;
 using Service.EducationPersonalApi.Models;
 using Service.Grpc;
 using Service.TutorialPersonal.Grpc;
-using Service.TutorialPersonal.Grpc.Models;
+using Service.TutorialPersonal.Grpc.Models.State;
 using Service.UserReward.Grpc;
 using Service.UserReward.Grpc.Models;
 using Service.Web;
