@@ -21,6 +21,8 @@ namespace Service.EducationPersonalApi.Controllers
 	[SwaggerResponse(HttpStatusCode.Unauthorized, null, Description = "Unauthorized")]
 	public class BaseController : ControllerBase
 	{
+		public static readonly EducationTutorial Tutorial = EducationTutorial.PersonalFinance;
+
 		private readonly ISystemClock _systemClock;
 		private readonly IEncoderDecoder _encoderDecoder;
 		private readonly ILogger _logger;
@@ -77,9 +79,7 @@ namespace Service.EducationPersonalApi.Controllers
 				return null;
 			}
 
-			if (tokenData.Tutorial != EducationTutorial.PersonalFinance
-				|| tokenData.Unit != unit
-				|| tokenData.Task != task)
+			if (tokenData.Tutorial != Tutorial || tokenData.Unit != unit || tokenData.Task != task)
 				return null;
 
 			TimeSpan span = _systemClock.Now.Subtract(tokenData.StartDate);

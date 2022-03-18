@@ -9,7 +9,7 @@ namespace Service.EducationPersonalApi.Modules
 	{
 		protected override void Load(ContainerBuilder builder)
 		{
-			builder.RegisterTutorialPersonalClient(Program.Settings.TutorialPersonalServiceUrl);
+			builder.RegisterTutorialPersonalClient(Program.Settings.EducationFlowServiceUrl);
 			builder.RegisterUserRewardClient(Program.Settings.UserRewardServiceUrl);
 
 			builder.RegisterType<SystemClock>().AsImplementedInterfaces().SingleInstance();

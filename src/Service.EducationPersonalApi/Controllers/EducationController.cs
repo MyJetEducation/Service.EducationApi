@@ -44,7 +44,7 @@ namespace Service.EducationPersonalApi.Controllers
 			CommonGrpcResponse response = await _userRewardService.LearningStartedAsync(new LearningStartedGrpcRequest
 			{
 				UserId = userId,
-				Tutorial = EducationTutorial.PersonalFinance,
+				Tutorial = Tutorial,
 				Unit = 1,
 				Task = 1
 			});
