@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <UserSecretsId>5ee9d029-ecfb-41e4-a93c-96e3b2ff0f05</UserSecretsId>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MyJetWallet.Domain" Version="1.1.1" />
+    <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="2.3.4" />
+    <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="2.4.6" />
+    <PackageReference Include="MyJetEducation.Service.TimeLogger.Client" Version="1.0.5" />
+    <PackageReference Include="MyJetEducation.Service.Core.Client" Version="1.0.33" />
+    <PackageReference Include="MyJetEducation.Service.TutorialPersonal.Client" Version="1.0.18" />
+    <PackageReference Include="MyJetEducation.Service.UserReward.Client" Version="1.0.7" />
+    <PackageReference Include="MyJetEducation.Service.Education" Version="1.0.2" />
+    <PackageReference Include="MyJetEducation.Service.Web" Version="1.0.3" />
+    <PackageReference Include="MyJetEducation.Service.Grpc" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
