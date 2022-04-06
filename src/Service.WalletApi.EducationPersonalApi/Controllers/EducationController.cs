@@ -1,8 +1,8 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyJetWallet.Sdk.Authorization.Http;
 using NSwag.Annotations;
 using Service.Core.Client.Models;
 using Service.Core.Client.Services;
@@ -38,7 +38,7 @@ namespace Service.WalletApi.EducationPersonalApi.Controllers
 		[SwaggerResponse(HttpStatusCode.OK, typeof (DataResponse<StatusResponse>), Description = "Ok")]
 		public async ValueTask<IActionResult> LearningStartedAsync()
 		{
-			Guid? userId = GetUserId();
+			string userId = this.GetClientId();
 			if (userId == null)
 				return StatusResponse.Error(ResponseCode.UserNotFound);
 
