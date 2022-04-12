@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="MyJetWallet.Domain" Version="1.1.1" />
     <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="3.0.0" />
-    <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.0" />
+    <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.2" />
     <PackageReference Include="MyJetEducation.Service.TimeLogger.Client" Version="1.0.6" />
     <PackageReference Include="MyJetEducation.Service.Core.Client" Version="1.0.35" />
     <PackageReference Include="MyJetEducation.Service.TutorialPersonal.Client" Version="1.0.19" />
