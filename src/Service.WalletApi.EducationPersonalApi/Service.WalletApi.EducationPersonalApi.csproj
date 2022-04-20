@@ -18,9 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetWallet.Domain" Version="1.1.1" />
-    <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="3.0.3" />
-    <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.4" />
+    <PackageReference Include="MyJetWallet.Domain" Version="1.2.1" />
+    <PackageReference Include="MyJetWallet.Sdk.Authorization" Version="3.0.10" />
+    <PackageReference Include="MyJetWallet.Sdk.WalletApi" Version="3.0.8" />
     <PackageReference Include="MyJetEducation.Service.TimeLogger.Client" Version="1.0.6" />
     <PackageReference Include="MyJetEducation.Service.Core.Client" Version="1.0.36" />
     <PackageReference Include="MyJetEducation.Service.TutorialPersonal.Client" Version="1.0.19" />
